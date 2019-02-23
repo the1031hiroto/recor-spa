@@ -4,41 +4,41 @@
         <draggable :list="batters" class="dragArea" element="ul">
             <li v-for="batter in batters">{{ batter.text }}</li>
         </draggable>
-        <button @click="reduceBatter">最後のバッターを除外</button>
+        <button @click="reduceBatter" type="button" class="btn btn-outline-warning">最後のバッターを除外</button>
         <br>
         <h2>打撃成績</h2>
         <br>
-        <select v-model="batter">
+        <select v-model="batter" class="custom-select my-1">
             <option v-for="batter in batters" v-bind:value="batter.value">
                 {{ batter.text }}
             </option>
         </select>
-        <select v-model="hit">
+        <select v-model="hit" class="custom-select my-1">
             <option v-for="hitOption in hitOptions" v-bind:value="hitOption.value">
                 {{ hitOption.text }}
             </option>
         </select>
 
-        <select v-model="out">
+        <select v-model="out" class="custom-select my-1">
             <option v-for="outOption in outOptions" v-bind:value="outOption.value">
                 {{ outOption.text }}
             </option>
         </select>
 
-        <select v-model="onBall">
+        <select v-model="onBall" class="custom-select my-1">
             <option v-for="onBallOption in onBallOptions" v-bind:value="onBallOption.value">
                 {{ onBallOption.text }}
             </option>
         </select>
 
-        <div id='option'>
+        <div id='option' class="custom-control custom-checkbox my-1">
             <label v-for="option in recordOptions" :for="option.value">
-                <input :id="option.value" :value="option.value" v-model="optionResult" type="checkbox" />
+                <input :id="option.value" :value="option.value" v-model="optionResult" type="checkbox"/>
                 {{ option.text }}
             </label>
         </div>
 
-        <select v-model="daten">
+        <select v-model="daten" class="custom-select my-1">
             <option v-for="datenOption in datenOptions" v-bind:value="datenOption.value">
                 {{ datenOption.text }}
             </option>
@@ -46,7 +46,7 @@
 
         <br>
 
-        <button class="btn btn-primary" @click="isConfirm = true">Submit</button>
+        <button @click="isConfirm = true" type="button" class="btn btn-outline-primary my-1">Submit</button>
         <div v-if="isConfirm" class="modal1">
             <div>
                 バッター：{{ batter }}<br>
@@ -55,24 +55,22 @@
                 打球：{{ onBall }}<br>
                 その他：{{ optionResult }}<br>
                 打点{{ daten }}<br>
-                <button class="btn btn-primary" @click="submit">Submit</button>
-                <button class="btn btn-danger" @click="isConfirm = false">Close</button>
+                <button class="btn btn-primary mx-1" @click="submit">Submit</button>
+                <button @click="isConfirm = false" type="button" class="btn btn-outline-primary mx-1">Close</button>
             </div>
         </div>
-
-        <Menu></Menu>
     </div>
 </template>
 
 
 <script>
+import firebase from "firebase";
 import draggable from 'vuedraggable'
-import Menu from './Menu.vue'
+import moment from 'moment'
 
 export default {
     components: {
         draggable,
-        Menu
     },
     name: "offence-add",
     data() {
@@ -152,14 +150,15 @@ export default {
             out: "",
             optionResult: [],
             daten: 0,
-            isConfirm: false
+            isConfirm: false,
+            showData: [0]
         };
     },
     methods: {
         submit: function () {
             const today = new Date()
-            result = {
-                "試合日": today.toLocaleDateString(),
+            let result = {
+                "試合日": moment(today).format('YYYY/MM/DD'),
                 "打席数": 1,
                 "選手名": this.batter
             }
@@ -209,4 +208,32 @@ export default {
         }
     }
 };
+
 </script>
+<style>
+/*modal*/
+.modal1 {
+    position: fixed;
+    z-index: 9998;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, .5);
+    display: table;
+    transition: opacity .3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal1 div {
+    padding: 4rem;
+    background: white;
+}
+.dragArea {
+    width: 10rem;
+}
+.dragArea li {
+    list-style-type: decimal;
+}
+</style>

@@ -1,16 +1,15 @@
 <template>
-    <div id="deffence-add-component">
+    <div id="deffence-add-component" class="d-flex justify-content-between flex-wrap">
         <h3>{{ deffence.name }}</h3>
-        <select v-model="position">
+        <select v-model="position" class="custom-select my-1">
             <option v-for="positionOption in this.positionOptions" v-bind:value="positionOption.value">
                 {{ positionOption.text }}
             </option>
         </select>
-        <button v-on:click="deffence.killSupportCount++">捕殺 {{ deffence.killSupportCount }} 回</button>
-        <button v-on:click="deffence.killCount++">刺殺 {{ deffence.killCount }} 回</button>
-        <button v-on:click="deffence.errorCount++">エラー {{ deffence.errorCount }} 回</button>
-        <div v-html="deffence.content"></div>
-        <button @click="subumitDeffence">submit</button>
+        <button v-on:click="deffence.killSupportCount++" type="button" class="btn btn-outline-secondary my-1">捕殺 {{ deffence.killSupportCount }} 回</button>
+        <button v-on:click="deffence.killCount++" type="button" class="btn btn-outline-secondary my-1">刺殺 {{ deffence.killCount }} 回</button>
+        <button v-on:click="deffence.errorCount++" type="button" class="btn btn-outline-secondary my-1">エラー {{ deffence.errorCount }} 回</button>
+        <button @click="subumitDeffence" type="button" class="btn btn-outline-primary my-1">submit</button>
     </div>
 </template>
 
@@ -66,14 +65,3 @@ export default {
     },
 };
 </script>
-<style>
-#deffence-add-component {
-    display: flex;
-    flex-wrap: wrap;
-    /* justify-content: space-around; */
-    align-items: center;
-}
-#deffence-add-component h3 {
-    flex: 0 1 10rem;
-}
-</style>

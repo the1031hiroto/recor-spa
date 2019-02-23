@@ -5,8 +5,6 @@
             v-bind:key="deffence.id"
             v-bind:deffence="deffence"
         ></deffence-add-component>
-
-        <Menu></Menu>
     </div>
 </template>
 
@@ -14,12 +12,10 @@
 import firebase from "firebase";
 import Vue from 'vue'
 import DeffenceAddComponent from './DeffenceAddComponent.vue'
-import Menu from './Menu.vue'
 
 export default {
     components: {
         DeffenceAddComponent,
-        Menu
     },
     name: "deffence-add",
     data() {
