@@ -59,16 +59,20 @@
                 <button class="btn btn-danger" @click="isConfirm = false">Close</button>
             </div>
         </div>
+
+        <Menu></Menu>
     </div>
 </template>
 
 
 <script>
 import draggable from 'vuedraggable'
+import Menu from './Menu.vue'
 
 export default {
     components: {
         draggable,
+        Menu
     },
     name: "offence-add",
     data() {

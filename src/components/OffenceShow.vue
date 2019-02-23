@@ -1,15 +1,18 @@
 <template>
-  <div id="offence-show">
-    <ul>
-        <button v-on:click="changeTabu('old')" v-bind:class="{'active': isActive === 'old'}" class="btn btn-primary">打撃成績トータル</button>
-        <button v-on:click="changeTabu('current')" v-bind:class="{'active': isActive === 'current'}" class="btn btn-primary">打撃成績今シーズン</button>
-    </ul>
-    <v-client-table :columns="columns" :data="showData" :options="options" class="table-striped table-sm table-condensed">
-    </v-client-table>
-  </div>
+    <div id="offence-show">
+        <ul>
+            <button v-on:click="changeTabu('old')" v-bind:class="{'active': isActive === 'old'}" class="btn btn-primary">打撃成績トータル</button>
+            <button v-on:click="changeTabu('current')" v-bind:class="{'active': isActive === 'current'}" class="btn btn-primary">打撃成績今シーズン</button>
+        </ul>
+        <v-client-table :columns="columns" :data="showData" :options="options" class="table-striped table-sm table-condensed">
+        </v-client-table>
+
+        <Menu></Menu>
+    </div>
 </template>
 
 <script>
+import Menu from './Menu.vue'
 import firebase from "firebase";
 import Vue from 'vue'
 import {ServerTable, ClientTable, Event} from 'vue-tables-2';
@@ -52,6 +55,9 @@ const columns = [
     "進塁打"
 ]
 export default {
+    components: {
+        Menu
+    },
     name: "offence-show",
     mounted() {
         const allRawData = firebase.database().ref("records");
