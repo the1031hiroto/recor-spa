@@ -1,0 +1,6 @@
+{
+  "projects": {
+    "staging": "recor-spa",
+    "default": "recor-spa"
+  }
+}
