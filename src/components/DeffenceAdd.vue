@@ -33,7 +33,9 @@ export default {
                 { id: 10, name: '涼', killSupportCount: 0, killCount: 0, errorCount: 0, },
                 { id: 11, name: 'さいち', killSupportCount: 0, killCount: 0, errorCount: 0, },
                 { id: 12, name: 'ゆーや', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 13, name: '岡さん', killSupportCount: 0, killCount: 0, errorCount: 0, }
+                { id: 13, name: '岡さん', killSupportCount: 0, killCount: 0, errorCount: 0, },
+                { id: 14, name: '小僧', killSupportCount: 0, killCount: 0, errorCount: 0, },
+                { id: 15, name: '航', killSupportCount: 0, killCount: 0, errorCount: 0, }
             ],
             position: 0,
         };

@@ -81,7 +81,9 @@ export default {
 #deffence-show table {
     font-size: .5rem;
 }
-th {
-    min-width: fit-content;
+#deffence-show table th {
+    background-color: #42b983;
+    color: white;
+    text-align: center !important;
 }
 </style>

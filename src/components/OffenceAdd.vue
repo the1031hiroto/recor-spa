@@ -91,6 +91,7 @@ export default {
                 { text: 'ゆーや', value: 'ゆーや' },
                 { text: '岡さん', value: '岡さん' },
                 { text: '航', value: '航' },
+                {text: '小僧', value: '小僧' },
             ],
             hitOptions: [
                 { text: '出塁', value: '' },

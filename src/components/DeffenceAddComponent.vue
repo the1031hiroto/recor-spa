@@ -1,6 +1,6 @@
 <template>
     <div id="deffence-add-component" class="d-flex justify-content-between flex-wrap">
-        <h3>{{ deffence.name }}</h3>
+        <h5>{{ deffence.name }}</h5>
         <select v-model="position" class="custom-select my-1">
             <option v-for="positionOption in this.positionOptions" v-bind:value="positionOption.value">
                 {{ positionOption.text }}
@@ -15,6 +15,7 @@
 
 <script>
 import firebase from "firebase";
+import moment from 'moment'
 
 export default {
     name: "deffence-add-component",
@@ -45,8 +46,8 @@ export default {
     methods: {
         subumitDeffence: function () {
             const today = new Date()
-            result = {
-                "試合日": today.toLocaleDateString(),
+            let result = {
+                "試合日": moment(today).format('YYYY/MM/DD'),
                 "ポジション": this.position,
                 "捕殺": this.deffence.killSupportCount,
                 "刺殺": this.deffence.killCount,

@@ -13,7 +13,36 @@
         </vuejs-datepicker>
         <b-table :items="showData" :fields="columns" striped hover responsive class="table-sm" />
 
-        <Menu></Menu>
+        <br>
+        <ul class="list-group">
+            <li class="list-group-item">
+                XR: EXtrapolated Runs 得点におけるチームへの貢献度 チームの全打者のXRを足すと、チームの総得点とほぼ同じになる
+                <br>
+                出典：<a href="https://www47.atwiki.jp/bbstats/pages/17.html" class="badge badge-secondary">野球関連指標まとめ</a>
+            </li>
+            <li class="list-group-item">
+                XR27: 1～9番まで任意の1人で打線を組んだら、一試合で何点獲れるかを表す。
+                <br>
+                出典：<a href="https://www47.atwiki.jp/bbstats/pages/17.html" class="badge badge-secondary">野球関連指標まとめ</a>
+            </li>
+            <li class="list-group-item">
+                wOBA: Weighted On Base Average 打席あたりにどれだけチームの得点増に貢献する打撃をしているか
+                <br>
+                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#wOBA" class="badge badge-secondary">野球関連指標まとめ</a>
+            </li>
+            <li class="list-group-item">
+                wRAA: Weighted Runs Above Average どれだけチームの得点を増やしたか、平均的な打者であればゼロ
+                <br>
+                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#wRAA" class="badge badge-secondary">Esse野球関連指標まとめ</a>
+            </li>
+            <li class="list-group-item">
+                選球眼(BB/K) = 四球 / 三振
+                <br>
+                四球数が多く三振数が少ない打者ほどこの数値が高くなるが、一方で四球も三振も多い選手、四球も三振も少ない選手の間で同じような数値が出てしまう。いかにBB/Kに優れていても、四球が少ない打者が選球眼が良いとはいえない。近代野球において四球の重要性は最早明白であり、逆に三振が多いことによる大きなマイナス面は見られないのである。実践において三振数とほぼ同数、あるいはそれ以上の四球を取る選手は「ハンド・アイ・コーディネーション（手と目の連係動作）に優れ、コンタクトの上手い打者」「バッティングのアプローチが適切で、ストライクゾーン管理能力に長けた打者」と評される。
+                <br>
+                出典：<a href="https://ja.wikipedia.org/wiki/%E9%81%B8%E7%90%83%E7%9C%BC" class="badge badge-secondary">フリー百科事典『ウィキペディア（Wikipedia）』</a>
+            </li>
+        </ul>
     </div>
 </template>
 
@@ -34,8 +63,8 @@ const columns = [
     "三割(4打数)",
     "XR",
     "XR27",
-    "wOBA",
-    "wRAA",
+    "WOBA",
+    "WRAA",
     "三振率",
     "四球率",
     "選球眼",
@@ -244,9 +273,9 @@ export default {
                             // 試合: current.試合,
                             打席数: current.打席数,
                             打数: current.打数,
-                            本塁打: current['1塁打'],
-                            本塁打: current['2塁打'],
-                            本塁打: current['3塁打'],
+                            '1塁打': current['1塁打'],
+                            '2塁打': current['2塁打'],
+                            '3塁打': current['3塁打'],
                             本塁打: current.本塁打,
                             打点: current.打点,
                             得点: current.得点,
@@ -314,7 +343,7 @@ function statistic(mainData) {
             mainData[i]["併殺打"]) * 27
         ).toFixed(2)
 
-        mainData[i]["wOBA"] = (
+        mainData[i]["WOBA"] = (
             0.692 * mainData[i]["四球"] +
             0.73 * mainData[i]["死球"] +
             0.966 * mainData[i]["失策出"] +
@@ -323,28 +352,28 @@ function statistic(mainData) {
             1.725 * mainData[i]["3塁打"] +
             2.065 * mainData[i]["本塁打"]
         ) / (dasu + shishi + mainData[i]["犠飛"])
-        mainData[i]["wOBA"] = mainData[i]["wOBA"] ? mainData[i]["wOBA"] : 0
+        mainData[i]["WOBA"] = mainData[i]["WOBA"] ? mainData[i]["WOBA"] : 0
 
         mainData[i]["三振率"] = (mainData[i]["三振"] / mainData[i]["打席数"]).toFixed(3)
         mainData[i]["四球率"] = (mainData[i]["四球"] / mainData[i]["打席数"]).toFixed(3)
 
     }
-    calculation_wOBA_avr(mainData)
+    calculation_WOBA_avr(mainData)
     return mainData
 }
 
-function calculation_wOBA_avr(mainData) {
-    let wOBA_avr = 0
+function calculation_WOBA_avr(mainData) {
+    let WOBA_avr = 0
     for (let i = 0; i < mainData.length; i++) {
-        wOBA_avr += mainData[i]["wOBA"]
+        WOBA_avr += mainData[i]["WOBA"]
     }
-    wOBA_avr /= mainData.length
-    add_wRAA(mainData, wOBA_avr)
+    WOBA_avr /= mainData.length
+    add_WRAA(mainData, WOBA_avr)
 }
 
-function add_wRAA(mainData, wOBA_avr) {
+function add_WRAA(mainData, WOBA_avr) {
     for (let i = 0; i < mainData.length; i++) {
-        mainData[i]["wRAA"] = ((mainData[i]["wOBA"]- wOBA_avr) / 1.24 * mainData[i]["打数"]).toFixed(2)
+        mainData[i]["WRAA"] = ((mainData[i]["WOBA"]- WOBA_avr) / 1.24 * mainData[i]["打数"]).toFixed(2)
     }
     findMax(mainData)
     return mainData
@@ -394,8 +423,8 @@ function findMax(mainData) {
         "選球眼": [],
         "XR": [],
         "XR27": [],
-        "wOBA": [],
-        "wRAA": [],
+        "WOBA": [],
+        "WRAA": [],
         "ゴロアウト": [],
         "フライアウト": [],
         "打球": [],
@@ -448,10 +477,10 @@ function findMax(mainData) {
 #offence-show table {
     font-size: .5rem;
 }
-th {
+#offence-show table th {
     background-color: #42b983;
     color: white;
-    min-width: 4rem;
+    min-width: 3rem;
     text-align: center !important;
 }
 td {
