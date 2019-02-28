@@ -11,9 +11,7 @@
             @input="inputDate"
             name="datepicker" >
         </vuejs-datepicker>
-        <v-client-table :columns="columns" :data="showData" :options="options" class="table-striped table-sm table-condensed">
-        </v-client-table>
-        <b-table hover :items="showData" />
+        <b-table :items="showData" :fields="columns" striped hover responsive class="table-sm" />
 
         <Menu></Menu>
     </div>
@@ -133,9 +131,9 @@ export default {
                         // 試合: current.試合,
                         打席数: current.打席数,
                         打数: current.打数,
-                        本塁打: current['1塁打'],
-                        本塁打: current['2塁打'],
-                        本塁打: current['3塁打'],
+                        '1塁打': current['1塁打'],
+                        '2塁打': current['2塁打'],
+                        '3塁打': current['3塁打'],
                         本塁打: current.本塁打,
                         打点: current.打点,
                         得点: current.得点,
@@ -169,21 +167,6 @@ export default {
             oldData: [],
             mainData: [0],
             showData: [1],
-            options: {
-                columnsDropdown: true,
-                sortable: columns,
-                filterByColumn: false,
-                perPage: 20
-                // dateColumns: ["試合日"],
-                // datepickerOptions:{ locale: { cancelLabel: 'Clear' } }
-                //highlightMatches: true
-                //headings: {
-                //    選手名: 'id',
-                //    試合: '名前',
-                //    打席数: 'メールアドレス'
-                //},
-                //headingsTooltips: {'選手名':'Expanded Title', '試合':'Expanded Title'}
-            },
             date: new Date(),
             DatePickerFormat: 'yyyy-MM-dd'
         };
@@ -445,17 +428,16 @@ function findMax(mainData) {
             //minData[i] = null
         }
     }
-    console.log(maxData)
     // console.log(minData)
 
     for (let i = 0; i < mainData.length; i++) {
         let k = 0
         let maxItem = {}
         for (k in maxData) {
-                if (maxData[k] && mainData[i][k] == maxData[k]) {
-                    maxItem[k] = 'info'
-                }
-                mainData[i]['_cellVariants'] = maxItem
+            if (maxData[k] && mainData[i][k] == maxData[k]) {
+                maxItem[k] = 'info'
+            }
+            mainData[i]['_cellVariants'] = maxItem
         }
     }
     return maxData
@@ -463,48 +445,44 @@ function findMax(mainData) {
 
 </script>
 <style>
-#offence-show .table-responsive {
+#offence-show table {
     font-size: .5rem;
 }
-#offence-show .VueTables__columns-dropdown-wrapper {
-  display: flex;
-}
-#offence-show .pull-right>.dropdown-menu {
-  left: 0;
-  right: auto;
-}
-
 th {
-  background-color: #42b983;
-  color: white;
-  min-width: 4rem;
-  text-align: center;
+    background-color: #42b983;
+    color: white;
+    min-width: 4rem;
+    text-align: center !important;
 }
 td {
-  text-align: center;
+    text-align: center;
+}
+td.table-info {
+    font-weight: bold;
+}
+.table-striped tbody tr:nth-of-type(even) td:first-child {
+    background: white;
+}
+.table-striped tbody tr:nth-of-type(odd) td:first-child {
+    background-color: rgb(242, 242, 242);
 }
 
 /*tableの最左列固定*/
 th:first-child,
 td:first-child {
-  position: sticky;
-  left: 0;
-  z-index: 100;
+    position: sticky !important;
+    left: 0;
+    z-index: 100;
 }
-tbody tr:nth-child(2n) td:first-child {
-  background: white;
-}
-tbody tr:nth-child(2n+1) td:first-child {
-  background: #f9f9f9;
+.vdp-datepicker__calendar {
+    z-index: 101 !important;
 }
 .table-hover>tbody>tr:hover,
 .table-hover>tbody>tr:hover td,
 .table-hover>tbody>tr:active td {
-  background-color: #bfbaba;
+    background-color: #bfbaba;
 }
-.vdp-datepicker__calendar {
-    z-index: 99999 !important;
-}
+
 /* TODO:ちゃんと非表示にする */
 .VueTables__limit-field,
 .VueTables__search {
