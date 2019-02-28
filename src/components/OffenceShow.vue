@@ -13,6 +13,7 @@
         </vuejs-datepicker>
         <v-client-table :columns="columns" :data="showData" :options="options" class="table-striped table-sm table-condensed">
         </v-client-table>
+        <b-table hover :items="showData" />
 
         <Menu></Menu>
     </div>
@@ -28,16 +29,19 @@ Vue.use(ClientTable);
 
 const columns = [
     "選手名",
-    "三振率",
-    "四球率",
-    "選球眼",
+    "打席数",
+    "打数",
+    "安打",
+    "打率",
+    "三割(4打数)",
     "XR",
     "XR27",
     "wOBA",
     "wRAA",
+    "三振率",
+    "四球率",
+    "選球眼",
     "試合",
-    "打席数",
-    "打数",
     "1塁打",
     "2塁打",
     "3塁打",
@@ -54,7 +58,6 @@ const columns = [
     "牽制死",
     "失策出",
     "塁打数",
-    "打率",
     "出塁率",
     "長打率",
     "OPS",
@@ -169,7 +172,8 @@ export default {
             options: {
                 columnsDropdown: true,
                 sortable: columns,
-                filterByColumn: true,
+                filterByColumn: false,
+                perPage: 20
                 // dateColumns: ["試合日"],
                 // datepickerOptions:{ locale: { cancelLabel: 'Clear' } }
                 //highlightMatches: true
@@ -291,14 +295,14 @@ export default {
 
 
 function statistic(mainData) {
-    let i = 0
-    for (i = 0; i < mainData.length; i++) {
+    for (let i = 0; i < mainData.length; i++) {
         const dasu = mainData[i]["打数"]
-        const anda = mainData[i]["1塁打"] + mainData[i]["2塁打"] + mainData[i]["3塁打"] + mainData[i]["本塁打"]
         const shishi = mainData[i]["四球"] + mainData[i]["死球"]
+        mainData[i]["安打"] = mainData[i]["1塁打"] + mainData[i]["2塁打"] + mainData[i]["3塁打"] + mainData[i]["本塁打"]
         mainData[i]["塁打数"] = mainData[i]["1塁打"] + mainData[i]["2塁打"] * 2 + mainData[i]["3塁打"] * 3 + mainData[i]["本塁打"]* 4
-        mainData[i]["打率"] = (anda / dasu).toFixed(3)
-        mainData[i]["出塁率"] = (anda + shishi) / (dasu + shishi + mainData[i]["犠飛"] + mainData[i]["犠打"])
+        mainData[i]["打率"] = (mainData[i]["安打"] / dasu).toFixed(3)
+        mainData[i]["三割(4打数)"] = calculate_tree_ratio(mainData[i]["安打"], dasu)
+        mainData[i]["出塁率"] = (mainData[i]["安打"] + shishi) / (dasu + shishi + mainData[i]["犠飛"] + mainData[i]["犠打"])
         mainData[i]["長打率"] = mainData[i]["塁打数"] / dasu
         mainData[i]["OPS"] = (mainData[i]["長打率"] + mainData[i]["出塁率"]).toFixed(3)
         mainData[i]["選球眼"] = (shishi / mainData[i]["三振"]).toFixed(3)
@@ -309,7 +313,7 @@ function statistic(mainData) {
             + mainData[i]["本塁打"] * 2.88
             + shishi * 0.68
             + mainData[i]["盗塁"] * 0.36
-            + (dasu - anda - mainData[i]["三振"]) * (-0.18)
+            + (dasu - mainData[i]["安打"] - mainData[i]["三振"]) * (-0.18)
             + mainData[i]["三振"] * (-0.196)
             + mainData[i]["併殺打"] * (-0.74)
             + mainData[i]["犠飛"] * 0.74
@@ -320,7 +324,7 @@ function statistic(mainData) {
         mainData[i]["XR27"] = (
             mainData[i]["XR"] /
             (dasu -
-            anda +
+            mainData[i]["安打"] +
             mainData[i]["牽制死"] +
             mainData[i]["犠飛"] +
             mainData[i]["犠打"] +
@@ -348,8 +352,7 @@ function statistic(mainData) {
 
 function calculation_wOBA_avr(mainData) {
     let wOBA_avr = 0
-    let i = 0
-    for (i = 0; i < mainData.length; i++) {
+    for (let i = 0; i < mainData.length; i++) {
         wOBA_avr += mainData[i]["wOBA"]
     }
     wOBA_avr /= mainData.length
@@ -357,15 +360,112 @@ function calculation_wOBA_avr(mainData) {
 }
 
 function add_wRAA(mainData, wOBA_avr) {
-    let i = 0
-    for (i = 0; i < mainData.length; i++) {
+    for (let i = 0; i < mainData.length; i++) {
         mainData[i]["wRAA"] = ((mainData[i]["wOBA"]- wOBA_avr) / 1.24 * mainData[i]["打数"]).toFixed(2)
     }
-    // findMax(mainData)
+    findMax(mainData)
     return mainData
 }
-</script>\
+
+function calculate_tree_ratio(anda, dasu) {
+    let k = 0
+    for (k = 0; k <= 4; k++) {
+            if( ( (anda + k) / (dasu + 4) ) >= 0.3 ) {
+                return (k + '安打')
+            }
+        }
+}
+
+function findMax(mainData) {
+    let dataList = {
+        "game_id": [],
+        "選手名": [],
+        "試合": [],
+        "打席数": [],
+        "打数": [],
+        "1塁打": [],
+        "2塁打": [],
+        "3塁打": [],
+        "本塁打": [],
+        "安打": [],
+        "打点": [],
+        "得点": [],
+        "四球": [],
+        "死球": [],
+        "三振": [],
+        "併殺打": [],
+        "犠飛": [],
+        "犠打": [],
+        "盗塁": [],
+        "盗死": [],
+        "牽制死": [],
+        "失策出": [],
+        "塁打数": [],
+        "打率": [],
+        "出塁率": [],
+        "長打率": [],
+        "OPS": [],
+        "得点圏打率": [],
+        "三振率": [],
+        "四球率": [],
+        "選球眼": [],
+        "XR": [],
+        "XR27": [],
+        "wOBA": [],
+        "wRAA": [],
+        "ゴロアウト": [],
+        "フライアウト": [],
+        "打球": [],
+        "ランナー1塁": [],
+        "進塁打": [],
+        "得点圏": [],
+        "打球": [],
+        "ゲッツー崩れ": [],
+        "試合日": [],
+        "三割(4打数)": [],
+        "_cellVariants": []
+    }
+    let i = 0
+    let x = []
+    for (i in mainData) {
+        for (x in mainData[i]) {
+            dataList[x].push(mainData[i][x])
+        }
+    }
+//TODO:何故かminDataと同時にやるとdataListが上書きされる
+
+    let maxData = dataList
+    //let minData = dataList
+    for (i in dataList) {
+        try{
+            maxData[i] = Math.max.apply(null, maxData[i])
+            //minData[i] = Math.min.apply(null, minData[i])
+        } catch(e){
+            maxData[i] = 0
+            //minData[i] = null
+        }
+    }
+    console.log(maxData)
+    // console.log(minData)
+
+    for (let i = 0; i < mainData.length; i++) {
+        let k = 0
+        let maxItem = {}
+        for (k in maxData) {
+                if (maxData[k] && mainData[i][k] == maxData[k]) {
+                    maxItem[k] = 'info'
+                }
+                mainData[i]['_cellVariants'] = maxItem
+        }
+    }
+    return maxData
+}
+
+</script>
 <style>
+#offence-show .table-responsive {
+    font-size: .5rem;
+}
 #offence-show .VueTables__columns-dropdown-wrapper {
   display: flex;
 }
@@ -377,7 +477,7 @@ function add_wRAA(mainData, wOBA_avr) {
 th {
   background-color: #42b983;
   color: white;
-  min-width: 9rem;
+  min-width: 4rem;
   text-align: center;
 }
 td {
@@ -404,5 +504,10 @@ tbody tr:nth-child(2n+1) td:first-child {
 }
 .vdp-datepicker__calendar {
     z-index: 99999 !important;
+}
+/* TODO:ちゃんと非表示にする */
+.VueTables__limit-field,
+.VueTables__search {
+    display: none  !important;
 }
 </style>
