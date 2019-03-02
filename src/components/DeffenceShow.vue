@@ -1,19 +1,20 @@
 <template>
-  <div id="deffence-show">
-    <b-table :items="deffenceData" :fields="columns" striped hover responsive class="table-sm" />
-  </div>
+    <div id="deffence-show">
+        <h2>守備成績</h2>
+        <b-table :items="deffenceData" :fields="columns" :sort-by.sync="sortBy" striped hover responsive class="table-sm" />
+    </div>
 </template>
 
 <script>
 import firebase from "firebase";
 
 const deffenceColumns = [
-    '選手名',
-    "刺殺",
-    "捕殺",
-    "エラー",
-    "守備率",
-    "ポジション"
+    { key: '選手名', sortable: true },
+    { key: '刺殺', sortable: true },
+    { key: '捕殺', sortable: true },
+    { key: 'エラー', sortable: true },
+    { key: '守備率', sortable: true },
+    { key: 'ポジション', sortable: true }
 ]
 
 export default {
@@ -72,6 +73,7 @@ export default {
             position: 0,
             isActive: "current",
             columns: deffenceColumns,
+            sortBy: '選手名',
             deffenceData: [],
         };
     }

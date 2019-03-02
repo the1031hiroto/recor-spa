@@ -1,7 +1,7 @@
 <template>
-    <div id="deffence-add-component" class="d-flex justify-content-between flex-wrap">
-        <h5>{{ deffence.name }}</h5>
-        <select v-model="position" class="custom-select my-1">
+    <div id="deffence-add-component" class="d-flex justify-content-between flex-wrap border-bottom my-2 py-2">
+        <h5 class="mt-2">{{ deffence.name }}</h5>
+        <select v-model="position" class="custom-select mb-2">
             <option v-for="positionOption in this.positionOptions" v-bind:value="positionOption.value">
                 {{ positionOption.text }}
             </option>
@@ -66,3 +66,12 @@ export default {
     },
 };
 </script>
+<style>
+/* TODO:bootstrap */
+    #deffence-add button {
+        font-size: .8rem;
+    }
+    #deffence-add select {
+        width: 16rem;
+    }
+</style>

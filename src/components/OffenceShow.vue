@@ -1,5 +1,6 @@
 <template>
     <div id="offence-show">
+        <h2>打撃成績</h2>
         <!--
         <ul>
             <button v-on:click="changeTabu('old')" v-bind:class="{'active': isActive === 'old'}" class="btn btn-primary">打撃成績トータル</button>
@@ -89,7 +90,7 @@ const columns = [
     "長打率",
     "OPS",
     "得点圏打率",
-    "ランナー1塁",
+    "走者1塁",
     "進塁打"
 ]
 export default {
@@ -130,7 +131,7 @@ export default {
                     element.牽制死 = element.牽制死 ? element.牽制死 : 0
                     element.失策出 = element.失策出 ? element.失策出 : 0
                     element.塁打数 = element.塁打数 ? element.塁打数 : 0
-                    element.ランナー1塁 = element.ランナー1塁 ? element.盗ランナー1塁塁 : 0
+                    element.走者1塁 = element.走者1塁 ? element.盗走者1塁塁 : 0
                     element.進塁打 = element.進塁打 ? element.進塁打 : 0
 
                     // element.試合 += current.試合
@@ -152,7 +153,7 @@ export default {
                     element.牽制死 += current.牽制死 ? current.牽制死 : 0
                     element.失策出 += current.失策出 ? current.失策出 : 0
                     element.塁打数 += current.塁打数 ? current.塁打数 : 0
-                    element.ランナー1塁 += current.ランナー1塁 ? current.ランナー1塁 : 0
+                    element.走者1塁 += current.走者1塁 ? current.走者1塁 : 0
                     element.進塁打 += current.進塁打 ? current.進塁打 : 0
                 } else {
                     result.push({
@@ -176,7 +177,7 @@ export default {
                         牽制死: current.牽制死,
                         失策出: current.失策出,
                         塁打数: current.塁打数,
-                        ランナー1塁: current.ランナー1塁,
+                        走者1塁: current.走者1塁,
                         進塁打: current.進塁打
                     })
                 }
@@ -243,7 +244,7 @@ export default {
                         element.牽制死 = element.牽制死 ? element.牽制死 : 0
                         element.失策出 = element.失策出 ? element.失策出 : 0
                         element.塁打数 = element.塁打数 ? element.塁打数 : 0
-                        element.ランナー1塁 = element.ランナー1塁 ? element.盗ランナー1塁塁 : 0
+                        element.走者1塁 = element.走者1塁 ? element.盗走者1塁塁 : 0
                         element.進塁打 = element.進塁打 ? element.進塁打 : 0
 
                         // element.試合 += current.試合
@@ -265,7 +266,7 @@ export default {
                         element.牽制死 += current.牽制死 ? current.牽制死 : 0
                         element.失策出 += current.失策出 ? current.失策出 : 0
                         element.塁打数 += current.塁打数 ? current.塁打数 : 0
-                        element.ランナー1塁 += current.ランナー1塁 ? current.ランナー1塁 : 0
+                        element.走者1塁 += current.走者1塁 ? current.走者1塁 : 0
                         element.進塁打 += current.進塁打 ? current.進塁打 : 0
                     } else {
                         result.push({
@@ -289,7 +290,7 @@ export default {
                             牽制死: current.牽制死,
                             失策出: current.失策出,
                             塁打数: current.塁打数,
-                            ランナー1塁: current.ランナー1塁,
+                            走者1塁: current.走者1塁,
                             進塁打: current.進塁打
                         })
                     }
@@ -428,7 +429,7 @@ function findMax(mainData) {
         "ゴロアウト": [],
         "フライアウト": [],
         "打球": [],
-        "ランナー1塁": [],
+        "走者1塁": [],
         "進塁打": [],
         "得点圏": [],
         "打球": [],

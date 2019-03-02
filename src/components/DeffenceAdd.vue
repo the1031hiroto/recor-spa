@@ -1,5 +1,6 @@
 <template>
     <div id="deffence-add">
+        <h2>守備追加</h2>
         <deffence-add-component
             v-for="deffence in deffences"
             v-bind:key="deffence.id"

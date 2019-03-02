@@ -1,62 +1,102 @@
 <template>
     <div id="offence-add">
-        <h2>打順</h2>
-        <draggable :list="batters" class="dragArea" element="ul">
-            <li v-for="batter in batters">{{ batter.text }}</li>
-        </draggable>
-        <button @click="reduceBatter" type="button" class="btn btn-outline-warning">最後のバッターを除外</button>
-        <br>
-        <h2>打撃成績</h2>
-        <br>
-        <select v-model="batter" class="custom-select my-1">
-            <option v-for="batter in batters" v-bind:value="batter.value">
-                {{ batter.text }}
-            </option>
-        </select>
-        <select v-model="hit" class="custom-select my-1">
-            <option v-for="hitOption in hitOptions" v-bind:value="hitOption.value">
-                {{ hitOption.text }}
-            </option>
-        </select>
-
-        <select v-model="out" class="custom-select my-1">
-            <option v-for="outOption in outOptions" v-bind:value="outOption.value">
-                {{ outOption.text }}
-            </option>
-        </select>
-
-        <select v-model="onBall" class="custom-select my-1">
-            <option v-for="onBallOption in onBallOptions" v-bind:value="onBallOption.value">
-                {{ onBallOption.text }}
-            </option>
-        </select>
-
-        <div id='option' class="custom-control custom-checkbox my-1">
-            <label v-for="option in recordOptions" :for="option.value">
-                <input :id="option.value" :value="option.value" v-model="optionResult" type="checkbox"/>
-                {{ option.text }}
-            </label>
+        <h2>打撃追加</h2>
+        <div class="border-bottom my-2 py-2">
+            <h3>打順</h3>
+            <draggable :list="batters" class="dragArea" element="ul">
+                <li v-for="batter in batters">{{ batter.text }}</li>
+            </draggable>
+            <button @click="reduceBatter" type="button" class="btn btn-outline-warning">最後のバッターを除外</button>
         </div>
+        <div class="border-bottom my-2 py-2">
+            <h3>打撃成績</h3>
+            <form @submit.prevent="validate">
+                <select v-model="batter" class="custom-select my-1" required>
+                    <option v-for="batter in batters" v-bind:value="batter.value">
+                        {{ batter.text }}
+                    </option>
+                </select>
+                <select v-model="hit" class="custom-select my-1">
+                    <option v-for="hitOption in hitOptions" v-bind:value="hitOption.value">
+                        {{ hitOption.text }}
+                    </option>
+                </select>
 
-        <select v-model="daten" class="custom-select my-1">
-            <option v-for="datenOption in datenOptions" v-bind:value="datenOption.value">
-                {{ datenOption.text }}
-            </option>
-        </select>
+                <select v-model="out" class="custom-select my-1">
+                    <option v-for="outOption in outOptions" v-bind:value="outOption.value">
+                        {{ outOption.text }}
+                    </option>
+                </select>
 
-        <br>
+                <select v-model="onBall" class="custom-select my-1">
+                    <option v-for="onBallOption in onBallOptions" v-bind:value="onBallOption.value">
+                        {{ onBallOption.text }}
+                    </option>
+                </select>
 
-        <button @click="isConfirm = true" type="button" class="btn btn-outline-primary my-1">Submit</button>
+                <select v-model="daten" class="custom-select my-1">
+                    <option v-for="datenOption in datenOptions" v-bind:value="datenOption.value">
+                        {{ datenOption.text }}
+                    </option>
+                </select>
+
+                <div id='option' class="custom-checkbox my-1">
+                    オプション：
+                    <label v-for="option in recordOptions" :for="option.value">
+                        <input :id="option.value" :value="option.value" v-model="optionResult" type="checkbox"/>
+                        {{ option.text }}
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-outline-primary my-1">追加</button>
+            </form>
+        </div>
+        <div class="border-bottom my-2 py-2">
+            <h3>その他</h3>
+            <form @submit.prevent="isConfirmOther = true">
+                <select v-model="batter" class="custom-select my-1" required>
+                    <option v-for="batter in batters" v-bind:value="batter.value">
+                        {{ batter.text }}
+                    </option>
+                </select>
+
+                <select v-model="other" class="custom-select my-1" required>
+                    <option v-for="otherOption in otherOptions" v-bind:value="otherOption.value">
+                        {{ otherOption.text }}
+                    </option>
+                </select>
+
+                <button type="submit" class="btn btn-outline-primary my-1">追加</button>
+            </form>
+        </div>
         <div v-if="isConfirm" class="modal1">
             <div>
-                バッター：{{ batter }}<br>
-                ヒット：{{ hit }}<br>
-                アウト：{{ out }}<br>
-                打球：{{ onBall }}<br>
-                その他：{{ optionResult }}<br>
-                打点{{ daten }}<br>
-                <button class="btn btn-primary mx-1" @click="submit">Submit</button>
-                <button @click="isConfirm = false" type="button" class="btn btn-outline-primary mx-1">Close</button>
+                <ul class="list-group mb-4">
+                    <li v-if="batter" class="list-group-item">バッター：{{ batter }}</li>
+                    <li v-if="hit" class="list-group-item">ヒット：{{ hit }}</li>
+                    <li v-if="out" class="list-group-item">アウト：{{ out }}</li>
+                    <li v-if="onBall" class="list-group-item">打球：{{ onBall }}</li>
+                    <li v-if="optionResult.length" class="list-group-item">オプション：{{ optionResult }}</li>
+                    <li v-if="daten" class="list-group-item">打点：{{ daten }}</li>
+                </ul>
+                <button class="btn btn-primary mx-1" @click="submit">確定</button>
+                <button @click="isConfirm = false" type="button" class="btn btn-outline-warning mx-1">閉じる</button>
+            </div>
+        </div>
+        <div v-if="isConfirmOther" class="modal1">
+            <div>
+                <ul class="list-group mb-4">
+                    <li class="list-group-item">バッター：{{ batter }}</li>
+                    <li class="list-group-item">{{ other }}を追加</li>
+                </ul>
+                <button class="btn btn-primary mx-1" @click="submitOther">確定</button>
+                <button @click="isConfirmOther = false" type="button" class="btn btn-outline-warning mx-1">閉じる</button>
+            </div>
+        </div>
+        <div v-if="message" class="modal1">
+            <div>
+                {{ message }}
+                <button @click="message = false" type="button" class="btn btn-outline-warning mx-1">閉じる</button>
             </div>
         </div>
     </div>
@@ -64,7 +104,7 @@
 
 
 <script>
-import firebase from "firebase";
+import firebase,{ functions } from "firebase";
 import draggable from 'vuedraggable'
 import moment from 'moment'
 
@@ -75,8 +115,9 @@ export default {
     name: "offence-add",
     data() {
         return {
+            message: "",
             batters: [
-                // { text: 'バッター', value: '' },
+                { text: 'バッター', value: '' },
                 { text: 'ひろと', value: 'ひろと' },
                 { text: '大志', value: '大志' },
                 { text: '龍', value: '龍' },
@@ -92,6 +133,7 @@ export default {
                 { text: '岡さん', value: '岡さん' },
                 { text: '航', value: '航' },
                 {text: '小僧', value: '小僧' },
+                {text: '浅野', value: '浅野' },
             ],
             hitOptions: [
                 { text: '出塁', value: '' },
@@ -101,7 +143,8 @@ export default {
                 { text: '本塁打', value: '本塁打' },
                 { text: '四球', value: '四球' },
                 { text: '死球', value: '死球' },
-                { text: '失策出', value: '失策出' }
+                { text: '失策出', value: '失策出' },
+                { text: 'ゲッツー崩れ', value: 'ゲッツー崩れ' }
             ],
             outOptions: [
                 { text: 'アウト', value: '' },
@@ -117,12 +160,14 @@ export default {
                 { text: 'ピッチャー', value: 'ピッチャー' },
                 { text: 'キャッチャー', value: 'キャッチャー' },
                 { text: '1塁', value: '1塁' },
+                { text: '1塁線', value: '1塁線' },
                 { text: '1,2塁間', value: '2塁間' },
                 { text: '2塁', value: '2塁' },
                 { text: '2遊間', value: '2遊間' },
                 { text: 'ショート', value: 'ショート' },
                 { text: '3遊間', value: '3遊間' },
                 { text: '3塁', value: '3塁' },
+                { text: '3塁線', value: '3塁線' },
                 { text: 'ライト', value: 'ライト' },
                 { text: '右中間', value: '右中間' },
                 { text: 'センター', value: 'センター' },
@@ -130,13 +175,9 @@ export default {
                 { text: 'レフト', value: 'レフト' }
             ],
             recordOptions: [
-                { text: '得点', value: '得点' },
-                { text: '盗塁', value: '盗塁' },
                 { text: '得点圏', value: '得点圏' },
-                { text: 'ランナー1塁', value: 'ランナー1塁' },
+                { text: '走者1塁', value: '走者1塁' },
                 { text: '進塁打', value: '進塁打' },
-                { text: 'ゲッツー崩れ', value: 'ゲッツー崩れ' },
-                { text: '盗塁死', value: '盗塁死' },
             ],
             datenOptions: [
                 { text: '打点', value: '' },
@@ -145,6 +186,12 @@ export default {
                 { text: '3打点', value: 3 },
                 { text: '4打点', value: 4 }
             ],
+            otherOptions: [
+                { text: 'その他', value: '' },
+                { text: '得点', value: '得点' },
+                { text: '盗塁', value: '盗塁' },
+                { text: '盗塁死', value: '盗塁死' },
+            ],
             batter: "",
             hit: "",
             onBall: "",
@@ -152,10 +199,20 @@ export default {
             optionResult: [],
             daten: 0,
             isConfirm: false,
-            showData: [0]
+            isConfirmOther: false,
+            showData: [0],
+            other: ""
         };
     },
     methods: {
+        validate: function () {
+            if (this.hit || this.out) {
+                this.isConfirm = true
+            } else {
+                this.message = "打席結果が選択されていません。"
+                return
+            }
+        },
         submit: function () {
             const today = new Date()
             let result = {
@@ -180,6 +237,7 @@ export default {
                 result["打球"] = this.onBall
             }
             if (this.optionResult) {
+                let i = 0
                 for (i in this.optionResult) {
                     result[this.optionResult[i]] = 1
                 }
@@ -190,19 +248,34 @@ export default {
 
             const directory = '/records'
             const commentsRef = firebase.database().ref(directory)
-            if (this.batter) {
-                commentsRef.push(result)
-            } else {
-                console.log("no batter")
-                return
-            }
-            this.batter = ""
+            commentsRef.push(result)
+
             this.hit = ""
             this.onBall = ""
             this.out = ""
             this.optionResult = []
             this.daten = 0
             this.isConfirm = false
+        },
+        submitOther: function () {
+            const today = new Date()
+            let result = {
+                "試合日": moment(today).format('YYYY/MM/DD'),
+                "選手名": this.batter
+            }
+            result[this.other] = 1
+
+            const directory = '/records'
+            const commentsRef = firebase.database().ref(directory)
+            if (this.batter) {
+                commentsRef.push(result)
+            } else {
+                this.error = true
+                this.message = "更新できませんでした。"
+                return
+            }
+            this.other = ""
+            this.isConfirmOther = false
         },
         reduceBatter: function () {
             this.batters.pop()
@@ -228,7 +301,7 @@ export default {
     align-items: center;
 }
 .modal1 div {
-    padding: 4rem;
+    padding: 2rem;
     background: white;
 }
 .dragArea {
