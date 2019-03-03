@@ -4,7 +4,7 @@
         <div class="border-bottom my-2 py-2">
             <h3>打順</h3>
             <draggable :list="batters" class="dragArea" element="ul">
-                <li v-for="batter in batters">{{ batter.text }}</li>
+                <li v-for="(batter, index) in batters" :key="index">{{ batter.text }}</li>
             </draggable>
             <button @click="reduceBatter" type="button" class="btn btn-outline-warning">最後のバッターを除外</button>
         </div>
@@ -12,37 +12,37 @@
             <h3>打撃成績</h3>
             <form @submit.prevent="validate">
                 <select v-model="batter" class="custom-select my-1" required>
-                    <option v-for="batter in batters" v-bind:value="batter.value">
+                    <option v-for="(batter, index) in batters" v-bind:value="batter.value" :key="index">
                         {{ batter.text }}
                     </option>
                 </select>
                 <select v-model="hit" class="custom-select my-1">
-                    <option v-for="hitOption in hitOptions" v-bind:value="hitOption.value">
+                    <option v-for="(hitOption, index) in hitOptions" v-bind:value="hitOption.value" :key="index">
                         {{ hitOption.text }}
                     </option>
                 </select>
 
                 <select v-model="out" class="custom-select my-1">
-                    <option v-for="outOption in outOptions" v-bind:value="outOption.value">
+                    <option v-for="(outOption, index) in outOptions" v-bind:value="outOption.value" :key="index">
                         {{ outOption.text }}
                     </option>
                 </select>
 
                 <select v-model="onBall" class="custom-select my-1">
-                    <option v-for="onBallOption in onBallOptions" v-bind:value="onBallOption.value">
+                    <option v-for="(onBallOption, index) in onBallOptions" v-bind:value="onBallOption.value" :key="index">
                         {{ onBallOption.text }}
                     </option>
                 </select>
 
                 <select v-model="daten" class="custom-select my-1">
-                    <option v-for="datenOption in datenOptions" v-bind:value="datenOption.value">
+                    <option v-for="(datenOption, index) in datenOptions" v-bind:value="datenOption.value" :key="index">
                         {{ datenOption.text }}
                     </option>
                 </select>
 
                 <div id='option' class="custom-checkbox my-1">
                     オプション：
-                    <label v-for="option in recordOptions" :for="option.value">
+                    <label v-for="(option, index) in recordOptions" :for="option.value" :key="index">
                         <input :id="option.value" :value="option.value" v-model="optionResult" type="checkbox"/>
                         {{ option.text }}
                     </label>
@@ -55,13 +55,13 @@
             <h3>その他</h3>
             <form @submit.prevent="isConfirmOther = true">
                 <select v-model="batter" class="custom-select my-1" required>
-                    <option v-for="batter in batters" v-bind:value="batter.value">
+                    <option v-for="(batter, index) in batters" v-bind:value="batter.value" :key="index">
                         {{ batter.text }}
                     </option>
                 </select>
 
                 <select v-model="other" class="custom-select my-1" required>
-                    <option v-for="otherOption in otherOptions" v-bind:value="otherOption.value">
+                    <option v-for="(otherOption, index) in otherOptions" v-bind:value="otherOption.value" :key="index">
                         {{ otherOption.text }}
                     </option>
                 </select>
