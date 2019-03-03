@@ -1,18 +1,22 @@
 <template>
     <div id="offence-show">
         <h2>打撃成績</h2>
-        <!--
-        <ul>
-            <button v-on:click="changeTabu('old')" v-bind:class="{'active': isActive === 'old'}" class="btn btn-primary">打撃成績トータル</button>
-            <button v-on:click="changeTabu('current')" v-bind:class="{'active': isActive === 'current'}" class="btn btn-primary">打撃成績今シーズン</button>
-        </ul>
-        -->
-        <vuejs-datepicker
-            v-model="date"
-            @input="inputDate"
-            name="datepicker" >
-        </vuejs-datepicker>
-        <b-table :items="showData" :fields="columns" striped hover responsive class="table-sm" />
+        <div class="row justify-content-between px-3 mb-2">
+            <div class="col-xs-3">
+                <vuejs-datepicker
+                    v-model="selectDate"
+                    @input="changeTabu"
+                    :format="customFormatter"
+                    :highlighted="highlighted"
+                    placeholder="日付で絞り込む"
+                    name="datepicker"
+                    class="col-xs" >
+                </vuejs-datepicker>
+            </div>
+            <button @click="changeTabu(new Date('2018'), new Date(new Date().getFullYear(), 11, 31))" v-bind:class="{'active': startAt === '2018/01/01'}" class="btn btn-outline-success btn-sm col-xs-3">トータル</button>
+            <button @click="changeTabu(new Date('2019'), new Date(new Date().getFullYear(), 11, 31))" v-bind:class="{'active': startAt === '2019/01/01'}" class="btn btn-outline-success btn-sm col-xs-3">今シーズン</button>
+        </div>
+        <b-table :items="mainData" :fields="columns" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" striped hover responsive class="table-sm" />
 
         <br>
         <ul class="list-group">
@@ -60,14 +64,14 @@ const columns = [
     "打席数",
     "打数",
     "安打",
-    "打率",
+    { key: '打率', sortable: true },
     "三割(4打数)",
-    "XR",
-    "XR27",
-    "WOBA",
-    "WRAA",
-    "三振率",
-    "四球率",
+    { key: 'XR', sortable: true },
+    { key: 'XR27', sortable: true },
+    { key: 'WOBA', sortable: true },
+    { key: 'WRAA', sortable: true },
+    { key: '三振率', sortable: true },
+    { key: '四球率', sortable: true },
     "選球眼",
     "試合",
     "1塁打",
@@ -99,123 +103,41 @@ export default {
     },
     name: "offence-show",
     mounted() {
-        const directory = '/records'
-        const allRawData = firebase.database().ref(directory);
-        let offenceDataList = []
-        allRawData.on('value', (snapshot) => {
-            const offenceData = snapshot.val()
-            Object.keys(offenceData).forEach(function (k, i) {
-                offenceDataList[i] = offenceData[k]
-            })
-            const sumOffenceData = offenceDataList.reduce(function (result, current) {
-                let element = result.find(function (p) {
-                    return p.選手名 === current.選手名
-                })
-                if (element) {
-                    // TODO:map?
-                    element.打席数 = element.打席数 ? element.打席数 : 0
-                    element.打数 = element.打数 ? element.打数 : 0
-                    element['1塁打'] = element['1塁打'] ? element['1塁打'] : 0
-                    element['2塁打'] = element['2塁打'] ? element['2塁打'] : 0
-                    element['3塁打'] = element['3塁打'] ? element['3塁打'] : 0
-                    element.本塁打 = element.本塁打 ? element.本塁打 : 0
-                    element.打点 = element.打点 ? element.打点 : 0
-                    element.得点 = element.得点 ? element.得点 : 0
-                    element.四球 = element.四球 ? element.四球 : 0
-                    element.死球 = element.死球 ? element.死球 : 0
-                    element.三振 = element.三振 ? element.三振 : 0
-                    element.併殺打 = element.併殺打 ? element.併殺打 : 0
-                    element.犠飛 = element.犠飛 ? element.犠飛 : 0
-                    element.犠打 = element.犠打 ? element.犠打 : 0
-                    element.盗塁 = element.盗塁 ? element.盗塁 : 0
-                    element.牽制死 = element.牽制死 ? element.牽制死 : 0
-                    element.失策出 = element.失策出 ? element.失策出 : 0
-                    element.塁打数 = element.塁打数 ? element.塁打数 : 0
-                    element.走者1塁 = element.走者1塁 ? element.盗走者1塁塁 : 0
-                    element.進塁打 = element.進塁打 ? element.進塁打 : 0
-
-                    // element.試合 += current.試合
-                    element.打席数 += current.打席数 ? current.打席数 : 0
-                    element.打数 += current.打数 ? current.打数 : 0
-                    element['1塁打'] += current['1塁打'] ? current['1塁打'] : 0
-                    element['2塁打'] += current['2塁打'] ? current['2塁打'] : 0
-                    element['3塁打'] += current['3塁打'] ? current['3塁打'] : 0
-                    element['本塁打'] += current['本塁打'] ? current['本塁打'] : 0
-                    element.打点 += current.打点 ? current.打点 : 0
-                    element.得点 += current.得点 ? current.得点 : 0
-                    element.四球 += current.四球 ? current.四球 : 0
-                    element.死球 += current.死球 ? current.死球 : 0
-                    element.三振 += current.三振 ? current.三振 : 0
-                    element.併殺打 += current.併殺打 ? current.併殺打 : 0
-                    element.犠飛 += current.犠飛 ? current.犠飛 : 0
-                    element.犠打 += current.犠打 ? current.犠打 : 0
-                    element.盗塁 += current.盗塁 ? current.盗塁 : 0
-                    element.牽制死 += current.牽制死 ? current.牽制死 : 0
-                    element.失策出 += current.失策出 ? current.失策出 : 0
-                    element.塁打数 += current.塁打数 ? current.塁打数 : 0
-                    element.走者1塁 += current.走者1塁 ? current.走者1塁 : 0
-                    element.進塁打 += current.進塁打 ? current.進塁打 : 0
-                } else {
-                    result.push({
-                        選手名: current.選手名,
-                        // 試合: current.試合,
-                        打席数: current.打席数,
-                        打数: current.打数,
-                        '1塁打': current['1塁打'],
-                        '2塁打': current['2塁打'],
-                        '3塁打': current['3塁打'],
-                        本塁打: current.本塁打,
-                        打点: current.打点,
-                        得点: current.得点,
-                        四球: current.四球,
-                        死球: current.死球,
-                        三振: current.三振,
-                        併殺打: current.併殺打,
-                        犠飛: current.犠飛,
-                        犠打: current.犠打,
-                        盗塁: current.盗塁,
-                        牽制死: current.牽制死,
-                        失策出: current.失策出,
-                        塁打数: current.塁打数,
-                        走者1塁: current.走者1塁,
-                        進塁打: current.進塁打
-                    })
-                }
-                return result
-            }, [])
-            this.mainData = sumOffenceData
-            this.showData = sumOffenceData
-            console.log(sumOffenceData)
-            this.mainData = statistic(sumOffenceData)
-            // this.oldData = statistic(sumOffenceData)
-        })
+        this.getData()
     },
     data() {
         return {
-            isActive: "current",
             columns: columns,
-            oldData: [],
+            sortBy: '打率',
+            sortDesc: true,
             mainData: [0],
-            showData: [1],
-            date: new Date(),
-            DatePickerFormat: 'yyyy-MM-dd'
+            startAt: new Date(new Date().getFullYear(), 0, 1),
+            endAt: new Date(new Date().getFullYear(), 11, 31),
+            selectDate: "",
+            highlighted: {
+                dates: [
+                    new Date("2019/02/03"),
+                    new Date("2019/02/10"),
+                    new Date("2019/02/17"),
+                    new Date("2019/2/24")
+                ],
+            }
         };
     },
     methods: {
-        changeTabu: function (tabu) {
-            this.isActive = tabu
-            if (tabu == "current") {
-                console.log(this.mainData)
-                this.showData = this.mainData
-            } else if (tabu == "old") {
-                this.showData = this.oldData
-            }
+        customFormatter(date) {
+            return moment(date).format('YYYY/MM/DD');
         },
-        inputDate: function(){
+        changeTabu: function (startAt, endAt) {
+            this.startAt = startAt
+            this.endAt = endAt ? endAt : startAt
+            this.getData()
+        },
+        getData: function(){
             const directory = '/records'
             const allRawData = firebase.database().ref(directory);
             let offenceDataList = []
-            allRawData.orderByChild("試合日").equalTo(moment(this.date).format('YYYY/MM/DD')).on('value', (snapshot) => {
+            allRawData.orderByChild("試合日").startAt(moment(this.startAt).format('YYYY/MM/DD')).endAt(moment(this.endAt).format('YYYY/MM/DD')).on('value', (snapshot) => {
                 const offenceData = snapshot.val()
                 Object.keys(offenceData).forEach(function (k, i) {
                     offenceDataList[i] = offenceData[k]
@@ -297,10 +219,8 @@ export default {
                     return result
                 }, [])
                 this.mainData = sumOffenceData
-                this.showData = sumOffenceData
                 console.log(sumOffenceData)
                 this.mainData = statistic(sumOffenceData)
-                // this.oldData = statistic(sumOffenceData)
             })
         }
     }
@@ -315,8 +235,9 @@ function statistic(mainData) {
         mainData[i]["塁打数"] = mainData[i]["1塁打"] + mainData[i]["2塁打"] * 2 + mainData[i]["3塁打"] * 3 + mainData[i]["本塁打"]* 4
         mainData[i]["打率"] = (mainData[i]["安打"] / dasu).toFixed(3)
         mainData[i]["三割(4打数)"] = calculate_tree_ratio(mainData[i]["安打"], dasu)
-        mainData[i]["出塁率"] = (mainData[i]["安打"] + shishi) / (dasu + shishi + mainData[i]["犠飛"] + mainData[i]["犠打"])
-        mainData[i]["長打率"] = mainData[i]["塁打数"] / dasu
+        const x = (mainData[i]["安打"] + shishi) / (dasu + shishi + mainData[i]["犠飛"] + mainData[i]["犠打"])
+        mainData[i]["出塁率"] = Math.floor(x * 100) / 100
+        mainData[i]["長打率"] = Math.floor(mainData[i]["塁打数"] / dasu * 100) / 100
         mainData[i]["OPS"] = (mainData[i]["長打率"] + mainData[i]["出塁率"]).toFixed(3)
         mainData[i]["選球眼"] = (shishi / mainData[i]["三振"]).toFixed(3)
         mainData[i]["XR"] = (
@@ -353,7 +274,7 @@ function statistic(mainData) {
             1.725 * mainData[i]["3塁打"] +
             2.065 * mainData[i]["本塁打"]
         ) / (dasu + shishi + mainData[i]["犠飛"])
-        mainData[i]["WOBA"] = mainData[i]["WOBA"] ? mainData[i]["WOBA"] : 0
+        mainData[i]["WOBA"] = mainData[i]["WOBA"] ? Math.floor(mainData[i]["WOBA"] * 100) / 100 : 0
 
         mainData[i]["三振率"] = (mainData[i]["三振"] / mainData[i]["打席数"]).toFixed(3)
         mainData[i]["四球率"] = (mainData[i]["四球"] / mainData[i]["打席数"]).toFixed(3)
@@ -517,5 +438,8 @@ td:first-child {
 .VueTables__limit-field,
 .VueTables__search {
     display: none  !important;
+}
+.vdp-datepicker input {
+    width: 8rem;
 }
 </style>
