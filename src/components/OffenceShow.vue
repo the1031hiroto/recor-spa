@@ -15,8 +15,9 @@
             </div>
             <button @click="changeTabu(new Date('2018'), new Date(new Date().getFullYear(), 11, 31))" v-bind:class="{'active': startAt === '2018/01/01'}" class="btn btn-outline-success btn-sm col-xs-3">トータル</button>
             <button @click="changeTabu(new Date('2019'), new Date(new Date().getFullYear(), 11, 31))" v-bind:class="{'active': startAt === '2019/01/01'}" class="btn btn-outline-success btn-sm col-xs-3">今シーズン</button>
+            <button @click="regulation()" v-bind:class="{'active': startAt === '2019/01/01'}" class="btn btn-outline-success btn-sm col-xs-3">規定打席以上</button>
         </div>
-        <b-table :items="mainData" :fields="columns" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" striped hover responsive class="table-sm" />
+        <b-table :items="showData" :fields="columns" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" striped hover responsive class="table-sm" />
 
         <br>
         <ul class="list-group">
@@ -72,7 +73,7 @@ const columns = [
     { key: 'WRAA', sortable: true },
     { key: '三振率', sortable: true },
     { key: '四球率', sortable: true },
-    "選球眼",
+    { key: 'BB/K', sortable: true },
     "試合",
     "1塁打",
     "2塁打",
@@ -111,6 +112,7 @@ export default {
             sortBy: '打率',
             sortDesc: true,
             mainData: [0],
+            showData: [0],
             startAt: new Date(new Date().getFullYear(), 0, 1),
             endAt: new Date(new Date().getFullYear(), 11, 31),
             selectDate: "",
@@ -148,6 +150,7 @@ export default {
                     })
                     if (element) {
                         // TODO:map?
+                        element.試合 = element.試合 ? element.試合 : 0
                         element.打席数 = element.打席数 ? element.打席数 : 0
                         element.打数 = element.打数 ? element.打数 : 0
                         element['1塁打'] = element['1塁打'] ? element['1塁打'] : 0
@@ -169,7 +172,7 @@ export default {
                         element.走者1塁 = element.走者1塁 ? element.盗走者1塁塁 : 0
                         element.進塁打 = element.進塁打 ? element.進塁打 : 0
 
-                        // element.試合 += current.試合
+                        element.試合 += current.試合 ? current.試合 : 0
                         element.打席数 += current.打席数 ? current.打席数 : 0
                         element.打数 += current.打数 ? current.打数 : 0
                         element['1塁打'] += current['1塁打'] ? current['1塁打'] : 0
@@ -193,7 +196,7 @@ export default {
                     } else {
                         result.push({
                             選手名: current.選手名,
-                            // 試合: current.試合,
+                            試合: current.試合,
                             打席数: current.打席数,
                             打数: current.打数,
                             '1塁打': current['1塁打'],
@@ -221,7 +224,20 @@ export default {
                 this.mainData = sumOffenceData
                 console.log(sumOffenceData)
                 this.mainData = statistic(sumOffenceData)
+                this.showData = this.mainData
             })
+        },
+        regulation: function() {
+            const maxData = findMax(this.mainData)
+            const regulation = maxData['試合'] * 2
+            this.showData = [0]
+            for (let i = 0; i < this.mainData.length; i++) {
+                if (this.mainData[i]["打席数"] >= regulation) {
+                    this.showData[i] = this.mainData[i]
+                }
+            }
+            this.showData = this.showData.filter(v => v)
+            this.showData = statistic(this.showData)
         }
     }
 };
@@ -239,7 +255,7 @@ function statistic(mainData) {
         mainData[i]["出塁率"] = Math.floor(x * 100) / 100
         mainData[i]["長打率"] = Math.floor(mainData[i]["塁打数"] / dasu * 100) / 100
         mainData[i]["OPS"] = (mainData[i]["長打率"] + mainData[i]["出塁率"]).toFixed(3)
-        mainData[i]["選球眼"] = (shishi / mainData[i]["三振"]).toFixed(3)
+        mainData[i]["BB/K"] = (shishi / mainData[i]["三振"]).toFixed(3)
         mainData[i]["XR"] = (
             mainData[i]["1塁打"]
             + mainData[i]["2塁打"] * 1.44
@@ -311,6 +327,7 @@ function calculate_tree_ratio(anda, dasu) {
 }
 
 function findMax(mainData) {
+    let items = {}
     let dataList = {
         "game_id": [],
         "選手名": [],
@@ -342,7 +359,7 @@ function findMax(mainData) {
         "得点圏打率": [],
         "三振率": [],
         "四球率": [],
-        "選球眼": [],
+        "BB/K": [],
         "XR": [],
         "XR27": [],
         "WOBA": [],
@@ -366,29 +383,33 @@ function findMax(mainData) {
             dataList[x].push(mainData[i][x])
         }
     }
-//TODO:何故かminDataと同時にやるとdataListが上書きされる
 
-    let maxData = dataList
-    //let minData = dataList
-    for (i in dataList) {
+    let maxData = Object.assign({}, dataList);
+    let minData = Object.assign({}, dataList);
+    for (i in maxData) {
         try{
             maxData[i] = Math.max.apply(null, maxData[i])
-            //minData[i] = Math.min.apply(null, minData[i])
+            minData[i] = Math.min.apply(null, minData[i])
         } catch(e){
             maxData[i] = 0
-            //minData[i] = null
+            minData[i] = 0
         }
     }
-    // console.log(minData)
 
     for (let i = 0; i < mainData.length; i++) {
         let k = 0
-        let maxItem = {}
+        let items = {}
         for (k in maxData) {
-            if (maxData[k] && mainData[i][k] == maxData[k]) {
-                maxItem[k] = 'info'
+            if (maxData[k] && k != '三振率' && mainData[i][k] == maxData[k]) {
+                items[k] = 'info'
+            } else if (maxData[k] && k == '三振率' && mainData[i][k] == maxData[k]) {
+                items[k] = 'danger'
+            } else if (minData[k] && k != '三振率' && mainData[i][k] == minData[k]) {
+                items[k] = 'danger'
+            } else if (minData[k] && k == '三振率' && mainData[i][k] == minData[k]) {
+                items[k] = 'info'
             }
-            mainData[i]['_cellVariants'] = maxItem
+            mainData[i]['_cellVariants'] = items
         }
     }
     return maxData
@@ -402,7 +423,7 @@ function findMax(mainData) {
 #offence-show table th {
     background-color: #42b983;
     color: white;
-    min-width: 3rem;
+    min-width: 2.5rem;
     text-align: center !important;
 }
 td {
@@ -433,7 +454,9 @@ td:first-child {
 .table-hover>tbody>tr:active td {
     background-color: #bfbaba;
 }
-
+#offence-show .list-group {
+    font-size: .5rem;
+}
 /* TODO:ちゃんと非表示にする */
 .VueTables__limit-field,
 .VueTables__search {

@@ -4,16 +4,18 @@
         <div class="border-bottom my-2 py-2">
             <h3>打順</h3>
             <draggable :list="batters" class="dragArea" element="ul">
-                <li v-for="(batter, index) in batters" :key="index">{{ batter.text }}</li>
+                <li v-for="(batter, index) in batters" :key="index">{{ batter }}</li>
             </draggable>
             <button @click="reduceBatter" type="button" class="btn btn-outline-warning">最後のバッターを除外</button>
+            <br>
+            <button @click="submitOrder" type="button" class="btn btn-outline-success my-1">打順確定</button>
         </div>
         <div class="border-bottom my-2 py-2">
             <h3>打撃成績</h3>
             <form @submit.prevent="validate">
                 <select v-model="batter" class="custom-select my-1" required>
-                    <option v-for="(batter, index) in batters" v-bind:value="batter.value" :key="index">
-                        {{ batter.text }}
+                    <option v-for="(batter, index) in batters" v-bind:value="batter" :key="index">
+                        {{ batter }}
                     </option>
                 </select>
                 <select v-model="hit" class="custom-select my-1">
@@ -55,8 +57,8 @@
             <h3>その他</h3>
             <form @submit.prevent="isConfirmOther = true">
                 <select v-model="batter" class="custom-select my-1" required>
-                    <option v-for="(batter, index) in batters" v-bind:value="batter.value" :key="index">
-                        {{ batter.text }}
+                    <option v-for="(batter, index) in batters" v-bind:value="batter" :key="index">
+                        {{ batter }}
                     </option>
                 </select>
 
@@ -117,23 +119,22 @@ export default {
         return {
             message: "",
             batters: [
-                { text: 'バッター', value: '' },
-                { text: 'ひろと', value: 'ひろと' },
-                { text: '大志', value: '大志' },
-                { text: '龍', value: '龍' },
-                { text: '達也', value: '達也' },
-                { text: '三好', value: '三好' },
-                { text: '先生', value: '先生' },
-                { text: 'バタニキ', value: 'バタニキ' },
-                { text: 'りょーま', value: 'りょーま' },
-                { text: '涼', value: '涼' },
-                { text: '隼人', value: '隼人' },
-                { text: 'さいち', value: 'さいち' },
-                { text: 'ゆーや', value: 'ゆーや' },
-                { text: '岡さん', value: '岡さん' },
-                { text: '航', value: '航' },
-                {text: '小僧', value: '小僧' },
-                {text: '浅野', value: '浅野' },
+                'ひろと',
+                '大志',
+                '龍',
+                '達也',
+                '三好',
+                '先生',
+                'バタニキ',
+                'りょーま',
+                '涼',
+                '隼人',
+                'さいち',
+                'ゆーや',
+                '岡さん',
+                '航',
+                '小僧',
+                '浅野',
             ],
             hitOptions: [
                 { text: '出塁', value: '' },
@@ -276,6 +277,22 @@ export default {
             }
             this.other = ""
             this.isConfirmOther = false
+        },
+        submitOrder: function () {
+            let i = 0
+            const today = new Date()
+            const directory = '/records'
+            const commentsRef = firebase.database().ref(directory)
+            for (i in this.batters) {
+                console.log(i)
+                let result = {
+                    "試合日": moment(today).format('YYYY/MM/DD'),
+                    "選手名": this.batters[i],
+                    "試合": 1
+                }
+                commentsRef.push(result)
+            }
+            // this.isConfirmOther = false
         },
         reduceBatter: function () {
             this.batters.pop()
