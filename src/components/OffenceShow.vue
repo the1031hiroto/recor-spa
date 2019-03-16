@@ -95,7 +95,7 @@ const columns = [
     "長打率",
     "OPS",
     "得点圏打率",
-    "走者1塁",
+    "走者有",
     "進塁打"
 ]
 export default {
@@ -169,7 +169,7 @@ export default {
                         element.牽制死 = element.牽制死 ? element.牽制死 : 0
                         element.失策出 = element.失策出 ? element.失策出 : 0
                         element.塁打数 = element.塁打数 ? element.塁打数 : 0
-                        element.走者1塁 = element.走者1塁 ? element.盗走者1塁塁 : 0
+                        element.走者有 = element.走者有 ? element.盗走者有塁 : 0
                         element.進塁打 = element.進塁打 ? element.進塁打 : 0
 
                         element.試合 += current.試合 ? current.試合 : 0
@@ -191,7 +191,7 @@ export default {
                         element.牽制死 += current.牽制死 ? current.牽制死 : 0
                         element.失策出 += current.失策出 ? current.失策出 : 0
                         element.塁打数 += current.塁打数 ? current.塁打数 : 0
-                        element.走者1塁 += current.走者1塁 ? current.走者1塁 : 0
+                        element.走者有 += current.走者有 ? current.走者有 : 0
                         element.進塁打 += current.進塁打 ? current.進塁打 : 0
                     } else {
                         result.push({
@@ -215,7 +215,7 @@ export default {
                             牽制死: current.牽制死,
                             失策出: current.失策出,
                             塁打数: current.塁打数,
-                            走者1塁: current.走者1塁,
+                            走者有: current.走者有,
                             進塁打: current.進塁打
                         })
                     }
@@ -367,7 +367,7 @@ function findMax(mainData) {
         "ゴロアウト": [],
         "フライアウト": [],
         "打球": [],
-        "走者1塁": [],
+        "走者有": [],
         "進塁打": [],
         "得点圏": [],
         "打球": [],
@@ -400,13 +400,14 @@ function findMax(mainData) {
         let k = 0
         let items = {}
         for (k in maxData) {
-            if (maxData[k] && k != '三振率' && mainData[i][k] == maxData[k]) {
+            const reverceData = ['三振', '三振率', '盗塁死', '牽制死', '併殺打']
+            if (maxData[k] && mainData[i][k] == maxData[k] && !reverceData.includes(k)) {
                 items[k] = 'info'
-            } else if (maxData[k] && k == '三振率' && mainData[i][k] == maxData[k]) {
+            } else if (maxData[k] && mainData[i][k] == maxData[k] && reverceData.includes(k)) {
                 items[k] = 'danger'
-            } else if (minData[k] && k != '三振率' && mainData[i][k] == minData[k]) {
+            } else if (minData[k] && mainData[i][k] == minData[k] && !reverceData.includes(k)) {
                 items[k] = 'danger'
-            } else if (minData[k] && k == '三振率' && mainData[i][k] == minData[k]) {
+            } else if (minData[k] && mainData[i][k] == minData[k] && reverceData.includes(k)) {
                 items[k] = 'info'
             }
             mainData[i]['_cellVariants'] = items

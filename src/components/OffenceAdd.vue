@@ -177,7 +177,7 @@ export default {
             ],
             recordOptions: [
                 { text: '得点圏', value: '得点圏' },
-                { text: '走者1塁', value: '走者1塁' },
+                { text: '走者有', value: '走者有' },
                 { text: '進塁打', value: '進塁打' },
             ],
             datenOptions: [
