@@ -74,6 +74,11 @@ const columns = [
     { key: '三振率', sortable: true },
     { key: '四球率', sortable: true },
     { key: 'BB/K', sortable: true },
+    "走者有",
+    "進塁打",
+    "進塁打率",
+    "ゴロアウト",
+    "フライアウト",
     "試合",
     "1塁打",
     "2塁打",
@@ -94,9 +99,31 @@ const columns = [
     "出塁率",
     "長打率",
     "OPS",
-    "得点圏打率",
+    "得点圏打率"
+]
+const dataColumns = [
+    "打席数",
+    "打数",
+    "試合",
+    "1塁打",
+    "2塁打",
+    "3塁打",
+    "本塁打",
+    "打点",
+    "得点",
+    "四球",
+    "死球",
+    "三振",
+    "併殺打",
+    "犠飛",
+    "犠打",
+    "盗塁",
+    "牽制死",
+    "失策出",
     "走者有",
-    "進塁打"
+    "進塁打",
+    "ゴロアウト",
+    "フライアウト"
 ]
 export default {
     components: {
@@ -144,80 +171,17 @@ export default {
                 Object.keys(offenceData).forEach(function (k, i) {
                     offenceDataList[i] = offenceData[k]
                 })
-                const sumOffenceData = offenceDataList.reduce(function (result, current) {
-                    let element = result.find(function (p) {
-                        return p.選手名 === current.選手名
-                    })
-                    if (element) {
-                        // TODO:map?
-                        element.試合 = element.試合 ? element.試合 : 0
-                        element.打席数 = element.打席数 ? element.打席数 : 0
-                        element.打数 = element.打数 ? element.打数 : 0
-                        element['1塁打'] = element['1塁打'] ? element['1塁打'] : 0
-                        element['2塁打'] = element['2塁打'] ? element['2塁打'] : 0
-                        element['3塁打'] = element['3塁打'] ? element['3塁打'] : 0
-                        element.本塁打 = element.本塁打 ? element.本塁打 : 0
-                        element.打点 = element.打点 ? element.打点 : 0
-                        element.得点 = element.得点 ? element.得点 : 0
-                        element.四球 = element.四球 ? element.四球 : 0
-                        element.死球 = element.死球 ? element.死球 : 0
-                        element.三振 = element.三振 ? element.三振 : 0
-                        element.併殺打 = element.併殺打 ? element.併殺打 : 0
-                        element.犠飛 = element.犠飛 ? element.犠飛 : 0
-                        element.犠打 = element.犠打 ? element.犠打 : 0
-                        element.盗塁 = element.盗塁 ? element.盗塁 : 0
-                        element.牽制死 = element.牽制死 ? element.牽制死 : 0
-                        element.失策出 = element.失策出 ? element.失策出 : 0
-                        element.塁打数 = element.塁打数 ? element.塁打数 : 0
-                        element.走者有 = element.走者有 ? element.盗走者有塁 : 0
-                        element.進塁打 = element.進塁打 ? element.進塁打 : 0
+                let sumOffenceData = offenceDataList.reduce(function (result, current) {
+                    result.map(item => Object.entries(item).map(([key, value]) => item[key] = value || 0));
+                    let element = result.find(name => name['選手名'] === current['選手名']);
 
-                        element.試合 += current.試合 ? current.試合 : 0
-                        element.打席数 += current.打席数 ? current.打席数 : 0
-                        element.打数 += current.打数 ? current.打数 : 0
-                        element['1塁打'] += current['1塁打'] ? current['1塁打'] : 0
-                        element['2塁打'] += current['2塁打'] ? current['2塁打'] : 0
-                        element['3塁打'] += current['3塁打'] ? current['3塁打'] : 0
-                        element['本塁打'] += current['本塁打'] ? current['本塁打'] : 0
-                        element.打点 += current.打点 ? current.打点 : 0
-                        element.得点 += current.得点 ? current.得点 : 0
-                        element.四球 += current.四球 ? current.四球 : 0
-                        element.死球 += current.死球 ? current.死球 : 0
-                        element.三振 += current.三振 ? current.三振 : 0
-                        element.併殺打 += current.併殺打 ? current.併殺打 : 0
-                        element.犠飛 += current.犠飛 ? current.犠飛 : 0
-                        element.犠打 += current.犠打 ? current.犠打 : 0
-                        element.盗塁 += current.盗塁 ? current.盗塁 : 0
-                        element.牽制死 += current.牽制死 ? current.牽制死 : 0
-                        element.失策出 += current.失策出 ? current.失策出 : 0
-                        element.塁打数 += current.塁打数 ? current.塁打数 : 0
-                        element.走者有 += current.走者有 ? current.走者有 : 0
-                        element.進塁打 += current.進塁打 ? current.進塁打 : 0
+                    if (element) {
+                        element['選手名'] = current['選手名']
+                        dataColumns.map(item => { element[item] += current[item]? current[item] : 0 });
                     } else {
-                        result.push({
-                            選手名: current.選手名,
-                            試合: current.試合,
-                            打席数: current.打席数,
-                            打数: current.打数,
-                            '1塁打': current['1塁打'],
-                            '2塁打': current['2塁打'],
-                            '3塁打': current['3塁打'],
-                            本塁打: current.本塁打,
-                            打点: current.打点,
-                            得点: current.得点,
-                            四球: current.四球,
-                            死球: current.死球,
-                            三振: current.三振,
-                            併殺打: current.併殺打,
-                            犠飛: current.犠飛,
-                            犠打: current.犠打,
-                            盗塁: current.盗塁,
-                            牽制死: current.牽制死,
-                            失策出: current.失策出,
-                            塁打数: current.塁打数,
-                            走者有: current.走者有,
-                            進塁打: current.進塁打
-                        })
+                        let a = { '選手名' : current['選手名'] }
+                        dataColumns.forEach(item => { a[item] = current[item] });
+                        result.push(a)
                     }
                     return result
                 }, [])
@@ -294,6 +258,7 @@ function statistic(mainData) {
 
         mainData[i]["三振率"] = (mainData[i]["三振"] / mainData[i]["打席数"]).toFixed(3)
         mainData[i]["四球率"] = (mainData[i]["四球"] / mainData[i]["打席数"]).toFixed(3)
+        mainData[i]["進塁打率"] = (mainData[i]["進塁打"] / mainData[i]["走者有"]).toFixed(3)
 
     }
     calculation_WOBA_avr(mainData)
@@ -369,6 +334,7 @@ function findMax(mainData) {
         "打球": [],
         "走者有": [],
         "進塁打": [],
+        "進塁打率": [],
         "得点圏": [],
         "打球": [],
         "ゲッツー崩れ": [],

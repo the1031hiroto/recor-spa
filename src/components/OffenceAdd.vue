@@ -179,6 +179,7 @@ export default {
                 { text: '得点圏', value: '得点圏' },
                 { text: '走者有', value: '走者有' },
                 { text: '進塁打', value: '進塁打' },
+                { text: '公式戦', value: '公式線' },
             ],
             datenOptions: [
                 { text: '打点', value: '' },
