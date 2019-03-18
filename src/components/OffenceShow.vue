@@ -16,6 +16,7 @@
             <button @click="changeTabu(new Date(new Date().getFullYear(), -12, 1), new Date(new Date().getFullYear(), 11, 31))" :class="{'active': startAt === '2018/01/01'}" class="btn btn-outline-success btn-sm col-xs-3">トータル</button>
             <button @click="changeTabu(new Date(new Date().getFullYear(), 0, 1), new Date(new Date().getFullYear(), 11, 31))" :class="{'active': startAt === '2019/01/01'}" class="btn btn-outline-success btn-sm col-xs-3">今シーズン</button>
             <button @click="regulation()" :class="{'active': regurstion === true}" class="btn btn-outline-success btn-sm col-xs-3">規定打席以上</button>
+            <button @click="getData(20)" class="btn btn-outline-success btn-sm col-xs-3">直近20打席</button>
         </div>
         <b-table :items="showData" :fields="columns" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" striped hover responsive small />
 
@@ -132,8 +133,7 @@ export default {
     },
     name: "offence-show",
     mounted() {
-        // console.log('hello')
-        this.getData()
+        this.getData(1000)
     },
     data() {
         return {
@@ -147,11 +147,12 @@ export default {
             selectDate: "",
             regurstion: false,
             highlighted: {
-                dates: [
+                dates: [//TODO: 動的に取得
                     new Date("2019/02/03"),
                     new Date("2019/02/10"),
                     new Date("2019/02/17"),
-                    new Date("2019/2/24")
+                    new Date("2019/02/24"),
+                    new Date("2019/03/10")
                 ],
             }
         };
@@ -164,9 +165,9 @@ export default {
             this.regurstion = false
             this.startAt = startAt
             this.endAt = endAt ? endAt : startAt
-            this.getData()
+            this.getData(1000)
         },
-        getData: function(){
+        getData: function(filterNum){
             const directory = '/records'
             const allRawData = firebase.database().ref(directory);
             let offenceDataList = []
@@ -181,7 +182,7 @@ export default {
 
                     if (element) {
                         element['選手名'] = current['選手名']
-                        dataColumns.map(item => { element[item] += current[item]? current[item] : 0 });
+                        dataColumns.map(item => { element[item] += current[item] && element['打席数'] < filterNum ? current[item] : 0 });
                     } else {
                         let data = { '選手名' : current['選手名'] }
                         dataColumns.forEach(item => { data[item] = current[item] });
