@@ -2,29 +2,24 @@
     <div id="deffence-add-component" class="d-flex justify-content-between flex-wrap border-bottom my-2 py-2">
         <h5 class="mt-2">{{ deffence.name }}</h5>
         <select v-model="position" class="custom-select mb-2">
-            <option v-for="positionOption in this.positionOptions" v-bind:value="positionOption.value">
+            <option v-for="(positionOption, index) in this.positionOptions" :value="positionOption.value" :key="index">
                 {{ positionOption.text }}
             </option>
         </select>
-        <button v-on:click="deffence.killSupportCount++" type="button" class="btn btn-outline-secondary my-1">捕殺 {{ deffence.killSupportCount }} 回</button>
-        <button v-on:click="deffence.killCount++" type="button" class="btn btn-outline-secondary my-1">刺殺 {{ deffence.killCount }} 回</button>
-        <button v-on:click="deffence.errorCount++" type="button" class="btn btn-outline-secondary my-1">エラー {{ deffence.errorCount }} 回</button>
-        <button @click="subumitDeffence" type="button" class="btn btn-outline-primary my-1">submit</button>
+        <button v-on:click="deffence.killSupportCount++" type="button" class="btn btn-outline-secondary btn-sm my-1">捕殺 {{ deffence.killSupportCount }} 回</button>
+        <button v-on:click="deffence.killCount++" type="button" class="btn btn-outline-secondary btn-sm my-1">刺殺 {{ deffence.killCount }} 回</button>
+        <button v-on:click="deffence.errorCount++" type="button" class="btn btn-outline-secondary btn-sm my-1">エラー {{ deffence.errorCount }} 回</button>
+        <button @click="subumitDeffence" type="button" class="btn btn-outline-primary btn-sm my-1">submit</button>
     </div>
 </template>
 
 <script>
-import firebase from "firebase";
+import firebase from 'firebase/app';
+import 'firebase/database';
 import moment from 'moment'
 
 export default {
     name: "deffence-add-component",
-    mounted() {
-        const allRawDeffenceData = firebase.database().ref("/deffence");
-        allRawDeffenceData.on('value', (snapshot) => {
-            this.deffenceData = snapshot.val()
-        })
-    },
     data() {
         return {
             positionOptions: [
@@ -38,16 +33,14 @@ export default {
                 { text: 'ライト', value: 'ライト' },
                 { text: 'センター', value: 'センター' },
                 { text: 'レフト', value: 'レフト' }
-            ],
-            deffenceData: 0
+            ]
         };
     },
     props: ['deffence', 'position'],
     methods: {
         subumitDeffence: function () {
-            const today = new Date()
             let result = {
-                "試合日": moment(today).format('YYYY/MM/DD'),
+                "試合日": moment(new Date()).format('YYYY/MM/DD'),
                 "ポジション": this.position,
                 "捕殺": this.deffence.killSupportCount,
                 "刺殺": this.deffence.killCount,
@@ -67,11 +60,7 @@ export default {
 };
 </script>
 <style>
-/* TODO:bootstrap */
-    #deffence-add button {
-        font-size: .8rem;
-    }
-    #deffence-add select {
-        width: 16rem;
-    }
+#deffence-add select {
+    width: 16rem;
+}
 </style>

@@ -10,3 +10,13 @@
     </div>
   </div>
 </template>
+<style>
+table {
+    font-size: .5rem;
+}
+table th {
+    background-color: #42b983;
+    color: white;
+    text-align: center !important;
+}
+</style>

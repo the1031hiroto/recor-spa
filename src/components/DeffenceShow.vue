@@ -1,21 +1,13 @@
 <template>
     <div id="deffence-show">
         <h2>守備成績</h2>
-        <b-table :items="deffenceData" :fields="columns" :sort-by.sync="sortBy" striped hover responsive class="table-sm" />
+        <b-table :items="deffenceData" :fields="columns" :sort-by.sync="sortBy" striped hover responsive small />
     </div>
 </template>
 
 <script>
-import firebase from "firebase";
-
-const deffenceColumns = [
-    { key: '選手名', sortable: true },
-    { key: '刺殺', sortable: true },
-    { key: '捕殺', sortable: true },
-    { key: 'エラー', sortable: true },
-    { key: '守備率', sortable: true },
-    { key: 'ポジション', sortable: true }
-]
+import firebase from 'firebase/app';
+import 'firebase/database';
 
 export default {
     name: "deffence-show",
@@ -27,10 +19,9 @@ export default {
             Object.keys(deffenceData).forEach(function (k, i) {
                 deffenceDataList[i] = deffenceData[k]
             })
-            const sumDeffenceData = deffenceDataList.reduce(function (result, current) {
-                let element = result.find(function (p) {
-                    return p.選手名 === current.選手名 && p.ポジション === current.ポジション
-                })
+            this.deffenceData  = deffenceDataList.reduce(function (result, current) {
+                let element = result.find(item => item['選手名'] === current['選手名'] && item.ポジション === current.ポジション);
+
                 if (element) {
                     element.刺殺 += current.刺殺
                     element.捕殺 += current.捕殺
@@ -46,46 +37,23 @@ export default {
                 }
                 return result
             }, [])
-            let i  = 0
-            for (i in sumDeffenceData) {
-                sumDeffenceData[i]['守備率'] = (sumDeffenceData[i]['刺殺'] + sumDeffenceData[i]['捕殺']) / (sumDeffenceData[i]['刺殺'] + sumDeffenceData[i]['捕殺'] + sumDeffenceData[i]['エラー'])
-            }
-            this.deffenceData = sumDeffenceData
+
+            this.deffenceData .map(item => { item['守備率'] = ((item['刺殺'] + item['捕殺']) / (item['刺殺'] + item['捕殺'] + item['エラー'])).toFixed(3) });
         })
     },
     data() {
         return {
-            deffences: [
-                { id: 1, name: 'ひろと', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 2, name: '大志', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 3, name: '龍', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 4, name: '達也', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 5, name: '三好', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 6, name: 'バタニキ', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 7, name: '隼人', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 8, name: '先生', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 9, name: 'りょーま', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 10, name: '涼', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 11, name: 'さいち', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 12, name: 'ゆーや', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 13, name: '岡さん', killSupportCount: 0, killCount: 0, errorCount: 0, }
+            columns: [
+                { key: '選手名', sortable: true },
+                { key: '刺殺', sortable: true },
+                { key: '捕殺', sortable: true },
+                { key: 'エラー', sortable: true },
+                { key: '守備率', sortable: true },
+                { key: 'ポジション', sortable: true }
             ],
-            position: 0,
-            isActive: "current",
-            columns: deffenceColumns,
             sortBy: '選手名',
             deffenceData: [],
         };
     }
 };
 </script>
-<style>
-#deffence-show table {
-    font-size: .5rem;
-}
-#deffence-show table th {
-    background-color: #42b983;
-    color: white;
-    text-align: center !important;
-}
-</style>

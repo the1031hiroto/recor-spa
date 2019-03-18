@@ -13,11 +13,11 @@
                     class="col-xs" >
                 </vuejs-datepicker>
             </div>
-            <button @click="changeTabu(new Date('2018'), new Date(new Date().getFullYear(), 11, 31))" v-bind:class="{'active': startAt === '2018/01/01'}" class="btn btn-outline-success btn-sm col-xs-3">トータル</button>
-            <button @click="changeTabu(new Date('2019'), new Date(new Date().getFullYear(), 11, 31))" v-bind:class="{'active': startAt === '2019/01/01'}" class="btn btn-outline-success btn-sm col-xs-3">今シーズン</button>
-            <button @click="regulation()" v-bind:class="{'active': startAt === '2019/01/01'}" class="btn btn-outline-success btn-sm col-xs-3">規定打席以上</button>
+            <button @click="changeTabu(new Date(new Date().getFullYear(), -12, 1), new Date(new Date().getFullYear(), 11, 31))" :class="{'active': startAt === '2018/01/01'}" class="btn btn-outline-success btn-sm col-xs-3">トータル</button>
+            <button @click="changeTabu(new Date(new Date().getFullYear(), 0, 1), new Date(new Date().getFullYear(), 11, 31))" :class="{'active': startAt === '2019/01/01'}" class="btn btn-outline-success btn-sm col-xs-3">今シーズン</button>
+            <button @click="regulation()" :class="{'active': regurstion === true}" class="btn btn-outline-success btn-sm col-xs-3">規定打席以上</button>
         </div>
-        <b-table :items="showData" :fields="columns" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" striped hover responsive class="table-sm" />
+        <b-table :items="showData" :fields="columns" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" striped hover responsive small />
 
         <br>
         <ul class="list-group">
@@ -53,11 +53,12 @@
 </template>
 
 <script>
-import firebase from "firebase";
+import firebase from 'firebase/app';
+import 'firebase/database';
 import vuejsDatepicker from 'vuejs-datepicker';
 import moment from 'moment'
 import Vue from 'vue'
-import {ServerTable, ClientTable, Event} from 'vue-tables-2';
+import ClientTable from 'vue-tables-2';
 Vue.use(ClientTable);
 
 const columns = [
@@ -131,6 +132,7 @@ export default {
     },
     name: "offence-show",
     mounted() {
+        // console.log('hello')
         this.getData()
     },
     data() {
@@ -143,6 +145,7 @@ export default {
             startAt: new Date(new Date().getFullYear(), 0, 1),
             endAt: new Date(new Date().getFullYear(), 11, 31),
             selectDate: "",
+            regurstion: false,
             highlighted: {
                 dates: [
                     new Date("2019/02/03"),
@@ -158,6 +161,7 @@ export default {
             return moment(date).format('YYYY/MM/DD');
         },
         changeTabu: function (startAt, endAt) {
+            this.regurstion = false
             this.startAt = startAt
             this.endAt = endAt ? endAt : startAt
             this.getData()
@@ -179,19 +183,20 @@ export default {
                         element['選手名'] = current['選手名']
                         dataColumns.map(item => { element[item] += current[item]? current[item] : 0 });
                     } else {
-                        let a = { '選手名' : current['選手名'] }
-                        dataColumns.forEach(item => { a[item] = current[item] });
-                        result.push(a)
+                        let data = { '選手名' : current['選手名'] }
+                        dataColumns.forEach(item => { data[item] = current[item] });
+                        result.push(data)
                     }
                     return result
                 }, [])
                 this.mainData = sumOffenceData
-                console.log(sumOffenceData)
+                // console.log(sumOffenceData)
                 this.mainData = statistic(sumOffenceData)
                 this.showData = this.mainData
             })
         },
         regulation: function() {
+            this.regurstion = true
             const maxData = findMax(this.mainData)
             const regulation = maxData['試合'] * 2
             this.showData = [0]
@@ -292,7 +297,6 @@ function calculate_tree_ratio(anda, dasu) {
 }
 
 function findMax(mainData) {
-    let items = {}
     let dataList = {
         "game_id": [],
         "選手名": [],
@@ -336,7 +340,6 @@ function findMax(mainData) {
         "進塁打": [],
         "進塁打率": [],
         "得点圏": [],
-        "打球": [],
         "ゲッツー崩れ": [],
         "試合日": [],
         "三割(4打数)": [],
@@ -384,14 +387,8 @@ function findMax(mainData) {
 
 </script>
 <style>
-#offence-show table {
-    font-size: .5rem;
-}
 #offence-show table th {
-    background-color: #42b983;
-    color: white;
     min-width: 2.5rem;
-    text-align: center !important;
 }
 td {
     text-align: center;

@@ -8,7 +8,7 @@
             </draggable>
             <button @click="reduceBatter" type="button" class="btn btn-outline-warning">最後のバッターを除外</button>
             <br>
-            <button @click="submitOrder" type="button" class="btn btn-outline-success my-1">打順確定</button>
+            <button @click="isConfirmOrder = true" type="button" class="btn btn-outline-success my-1">打順確定</button>
         </div>
         <div class="border-bottom my-2 py-2">
             <h3>打撃成績</h3>
@@ -95,6 +95,15 @@
                 <button @click="isConfirmOther = false" type="button" class="btn btn-outline-warning mx-1">閉じる</button>
             </div>
         </div>
+        <div v-if="isConfirmOrder" class="modal1">
+            <div>
+                <ul class="list-group mb-4">
+                    <li v-for="(batter, index) in batters" :key="index">{{ batter }}</li>
+                </ul>
+                <button class="btn btn-primary mx-1" @click="submitOrder">確定</button>
+                <button @click="isConfirmOrder = false" type="button" class="btn btn-outline-warning mx-1">閉じる</button>
+            </div>
+        </div>
         <div v-if="message" class="modal1">
             <div>
                 {{ message }}
@@ -106,7 +115,8 @@
 
 
 <script>
-import firebase,{ functions } from "firebase";
+import firebase from 'firebase/app';
+import 'firebase/database';
 import draggable from 'vuedraggable'
 import moment from 'moment'
 
@@ -179,7 +189,7 @@ export default {
                 { text: '得点圏', value: '得点圏' },
                 { text: '走者有', value: '走者有' },
                 { text: '進塁打', value: '進塁打' },
-                { text: '公式戦', value: '公式線' },
+                { text: '公式戦', value: '公式戦' },
             ],
             datenOptions: [
                 { text: '打点', value: '' },
@@ -202,55 +212,41 @@ export default {
             daten: 0,
             isConfirm: false,
             isConfirmOther: false,
+            isConfirmOrder: false,
             showData: [0],
             other: ""
         };
     },
     methods: {
         validate: function () {
-            if (this.hit || this.out) {
-                this.isConfirm = true
-            } else {
-                this.message = "打席結果が選択されていません。"
-                return
-            }
+            this.hit || this.out? this.isConfirm = true : this.message = "打席結果が選択されていません。"
         },
         submit: function () {
-            const today = new Date()
             let result = {
-                "試合日": moment(today).format('YYYY/MM/DD'),
+                "試合日": moment(new Date()).format('YYYY/MM/DD'),
                 "打席数": 1,
                 "選手名": this.batter
             }
-            //TODO: game_id
-            //TODO: 条件分岐をちゃんとする
-            if (this.hit == "四球" || this.hit == "死球" || this.out == "犠打" || this.out == "犠飛") {
-                result["打数"] = 0
-            } else {
+
+            this.hit? result[this.hit] = 1 : result[this.out] = 1
+
+            if (this.hit != "四球" || this.hit != "死球" || this.out != "犠打" || this.out != "犠飛") {
                 result["打数"] = 1
             }
-            if (this.hit) {
-                result[this.hit] = 1
-            } else if (this.out) {
-                result[this.out] = 1
-            }
-            //TODO: 条件分岐をちゃんとする
+
             if ((this.hit != "四球" || this.hit != "死球" || this.out != "三振") && this.onBall) {
                 result["打球"] = this.onBall
             }
+
             if (this.optionResult) {
-                let i = 0
-                for (i in this.optionResult) {
-                    result[this.optionResult[i]] = 1
-                }
+                this.optionResult.map(item => { result[item] = 1});
             }
-            if (this.daten > 0) {
+
+            if (this.daten) {
                 result["打点"] = this.daten
             }
 
-            const directory = '/records'
-            const commentsRef = firebase.database().ref(directory)
-            commentsRef.push(result)
+            this.updateDB(result)
 
             this.hit = ""
             this.onBall = ""
@@ -260,43 +256,36 @@ export default {
             this.isConfirm = false
         },
         submitOther: function () {
-            const today = new Date()
             let result = {
-                "試合日": moment(today).format('YYYY/MM/DD'),
+                "試合日": moment(new Date()).format('YYYY/MM/DD'),
                 "選手名": this.batter
             }
             result[this.other] = 1
 
-            const directory = '/records'
-            const commentsRef = firebase.database().ref(directory)
-            if (this.batter) {
-                commentsRef.push(result)
-            } else {
-                this.error = true
-                this.message = "更新できませんでした。"
-                return
-            }
+            this.updateDB(result)
+
             this.other = ""
             this.isConfirmOther = false
         },
         submitOrder: function () {
             let i = 0
-            const today = new Date()
-            const directory = '/records'
-            const commentsRef = firebase.database().ref(directory)
             for (i in this.batters) {
-                console.log(i)
                 let result = {
-                    "試合日": moment(today).format('YYYY/MM/DD'),
+                    "試合日": moment(new Date()).format('YYYY/MM/DD'),
                     "選手名": this.batters[i],
                     "試合": 1
                 }
-                commentsRef.push(result)
+                this.updateDB(result)
             }
-            // this.isConfirmOther = false
+            this.isConfirmOrder = false
         },
         reduceBatter: function () {
             this.batters.pop()
+        },
+        updateDB: function (result) {
+            const directory = '/records'
+            const db = firebase.database().ref(directory)
+            db.push(result)
         }
     }
 };

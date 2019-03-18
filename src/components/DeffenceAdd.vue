@@ -3,15 +3,13 @@
         <h2>守備追加</h2>
         <deffence-add-component
             v-for="deffence in deffences"
-            v-bind:key="deffence.id"
+            :key="deffence.id"
             v-bind:deffence="deffence"
         ></deffence-add-component>
     </div>
 </template>
 
 <script>
-import firebase from "firebase";
-import Vue from 'vue'
 import DeffenceAddComponent from './DeffenceAddComponent.vue'
 
 export default {
