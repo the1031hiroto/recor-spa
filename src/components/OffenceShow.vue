@@ -57,9 +57,79 @@
             <li class="list-group-item">
                 選球眼(BB/K) = 四球 / 三振
                 <br>
-                四球数が多く三振数が少ない打者ほどこの数値が高くなるが、一方で四球も三振も多い選手、四球も三振も少ない選手の間で同じような数値が出てしまう。いかにBB/Kに優れていても、四球が少ない打者が選球眼が良いとはいえない。近代野球において四球の重要性は最早明白であり、逆に三振が多いことによる大きなマイナス面は見られないのである。実践において三振数とほぼ同数、あるいはそれ以上の四球を取る選手は「ハンド・アイ・コーディネーション（手と目の連係動作）に優れ、コンタクトの上手い打者」「バッティングのアプローチが適切で、ストライクゾーン管理能力に長けた打者」と評される。
+                三振数以上の四球を取る選手は手と目の連係動作に優れ、「バッティングのアプローチが適切で、ストライクゾーン管理能力に長けた打者」と評される。
                 <br>
                 出典：<a href="https://ja.wikipedia.org/wiki/%E9%81%B8%E7%90%83%E7%9C%BC" class="badge badge-secondary">フリー百科事典『ウィキペディア（Wikipedia）』</a>
+            </li>
+            <li class="list-group-item">
+                BABIP ＝ (安打数－本塁打数) ／ (打数＋犠飛－本塁打－三振)
+                <br>
+                フェアゾーンに飛んだ打球の内、安打になった割合を示す指標。
+                <br>
+                ボテボテの打球が内野安打になる、打ち損じた打球が野手の間に落ちるなどの幸運が多いシーズンは数値が高くなり、芯で捉えた打球が野手の正面を突くなど不運に見舞われたシーズンは数値が低くなる。
+                <br>
+                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#BABIP" class="badge badge-secondary">野球関連指標まとめ</a>
+            </li>
+            <li class="list-group-item">
+                NOI ＝ (出塁率＋長打率÷3) × 1000
+                <br>
+                出塁率の価値を3倍にしたOPS。450以上ならば平均的な打者、550以上ならば主力級の打者、600以上ならば一流打者となる。
+                <br>
+                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#NOI" class="badge badge-secondary">野球関連指標まとめ</a>
+            </li>
+            <li class="list-group-item">
+                GPA ＝ (出塁率×1.8＋長打率) / 4
+                <br>
+                出塁率の価値を1.8倍にしたOPS。
+                <br>
+                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#GPA" class="badge badge-secondary">野球関連指標まとめ</a>
+            </li>
+            <li class="list-group-item">
+                IsoD ＝ 出塁率 ー 打率
+                <br>
+                出塁率から打率を減算した数値で、「四死球によってどの程度出塁したか」を測れる四死球占有率である。評価基準は0.07から0.08あれば合格点、0.1越えならその分野では一流と言われている。
+                <br>
+                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#IsoD" class="badge badge-secondary">野球関連指標まとめ</a>
+            </li>
+            <li class="list-group-item">
+                純粋に長打力を評価するために作られた指標。すべての安打が単打であった場合、IsoPは0となる。
+                <br>
+                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#IsoP" class="badge badge-secondary">野球関連指標まとめ</a>
+            </li>
+            <li class="list-group-item">
+                ＰＡ／Ｋ ＝ 打席 ／ 三振
+                <br>
+                １三振するまでに掛かる打席数
+                <br>
+                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#PA/K" class="badge badge-secondary">野球関連指標まとめ</a>
+            </li>
+            <li class="list-group-item">
+                ＡＢ／ＨＲ ＝ 打数 ／ 本塁打
+                <br>
+                １本塁打を記録するまでに掛かる打数
+                <br>
+                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#AB/HR" class="badge badge-secondary">野球関連指標まとめ</a>
+            </li>
+            <li class="list-group-item">
+                SecA=（塁打数 - 安打 + 四球 + 盗塁 - 盗塁失敗）/ 打数
+                <br>
+                打率から長打の要素を抽出したもの。.500以上なら一流。
+                <br>
+                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#SecA" class="badge badge-secondary">野球関連指標まとめ</a>
+            </li>
+            <li class="list-group-item">
+                TA=（塁打数 + 四球 + 死球 + 盗塁 - 盗塁失敗）/（打数 - 安打 + 盗塁失敗 + 併殺打)
+                <br>
+                打者が１アウト当たりにどれだけの塁打を得ることが出来たかを示す指標。
+                <br>
+                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#TA" class="badge badge-secondary">野球関連指標まとめ</a>
+            </li>
+            <li class="list-group-item">
+                PS ＝ (本塁打 × 盗塁 × ２) ／ (本塁打 ＋ 盗塁)
+                <br>
+                パワー・機動力を兼ね揃えた選手かを見るための指標。P-Sと表記されることが多い？
+                <br>
+                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#PS" class="badge badge-secondary">野球関連指標まとめ</a>
             </li>
         </ul>
     </div>
@@ -88,6 +158,16 @@ const columns = [
     { key: '三振率', sortable: true },
     { key: '四球率', sortable: true },
     { key: 'BB/K', sortable: true },
+    "BABIP",
+    "NOI",
+    "GPA",
+    "ISOD",
+    "ISOP",
+    "PA/K",
+    "AB/HR",
+    "SECA",
+    "TA",
+    "PS",
     "走者有",
     "進塁打",
     "進塁打率",
@@ -154,6 +234,13 @@ export default {
             columns: columns,
             sortBy: '打率',
             sortDesc: true,
+            // options: {
+            //     columnsDropdown: true,
+
+            //     sortable: [
+            //         'id', 'name'
+            //     ],
+            // },
             mainData: [0],
             showData: [0],
             startAt: new Date(new Date().getFullYear(), 0, 1),
@@ -236,13 +323,20 @@ export default {
                 const shishi = mainData[i]["四球"] + mainData[i]["死球"]
                 mainData[i]["安打"] = mainData[i]["1塁打"] + mainData[i]["2塁打"] + mainData[i]["3塁打"] + mainData[i]["本塁打"]
                 mainData[i]["塁打数"] = mainData[i]["1塁打"] + mainData[i]["2塁打"] * 2 + mainData[i]["3塁打"] * 3 + mainData[i]["本塁打"]* 4
-                mainData[i]["打率"] = (mainData[i]["安打"] / dasu).toFixed(3)
+                mainData[i]["打率"] = Math.floor(mainData[i]["安打"] / dasu * 100) / 100
                 mainData[i]["三割(4打数)"] = this.calculate_tree_ratio(mainData[i]["安打"], dasu)
                 const x = (mainData[i]["安打"] + shishi) / (dasu + shishi + mainData[i]["犠飛"] + mainData[i]["犠打"])
                 mainData[i]["出塁率"] = Math.floor(x * 100) / 100
+                mainData[i]["ISOD"] = Math.floor((mainData[i]["出塁率"] - mainData[i]["打率"]) * 100) / 100
                 mainData[i]["長打率"] = Math.floor(mainData[i]["塁打数"] / dasu * 100) / 100
                 mainData[i]["OPS"] = (mainData[i]["長打率"] + mainData[i]["出塁率"]).toFixed(3)
+                mainData[i]["NOI"] = ((mainData[i]["長打率"] + mainData[i]["出塁率"] / 3) * 1000).toFixed(3)
+                mainData[i]["GPA"] = ((mainData[i]["長打率"] * 1.8 + mainData[i]["出塁率"]) / 4).toFixed(3)
+                mainData[i]["ISOP"] = Math.floor((mainData[i]["長打率"] - mainData[i]["打率"]) * 100) / 100
                 mainData[i]["BB/K"] = (shishi / mainData[i]["三振"]).toFixed(3)
+                mainData[i]["PA/K"] = (mainData[i]["打席数"] / mainData[i]["三振"]).toFixed(3)
+                mainData[i]["AB/HR"] = (dasu / mainData[i]["本塁打"]).toFixed(3)
+                // ＡＢ／ＨＲ＝打数／本塁打
                 mainData[i]["XR"] = (
                     mainData[i]["1塁打"]
                     + mainData[i]["2塁打"] * 1.44
@@ -282,6 +376,16 @@ export default {
                 mainData[i]["三振率"] = (mainData[i]["三振"] / mainData[i]["打席数"]).toFixed(3)
                 mainData[i]["四球率"] = (mainData[i]["四球"] / mainData[i]["打席数"]).toFixed(3)
                 mainData[i]["進塁打率"] = (mainData[i]["進塁打"] / mainData[i]["走者有"]).toFixed(3)
+
+                mainData[i]["BABIP"] = ((mainData[i]["安打"] - mainData[i]["本塁打"]) / (dasu + mainData[i]["犠打"] - mainData[i]["本塁打"] - mainData[i]["三振"])).toFixed(3)
+                const caughtStealing = mainData[i]["盗塁死"] ? mainData[i]["盗塁死"] : 0
+                mainData[i]["SECA"] = ((mainData[i]["塁打数"] - mainData[i]["安打"] + mainData[i]["四球"] + mainData[i]["盗塁"] - caughtStealing) / dasu).toFixed(3)
+                mainData[i]["TA"] = (
+                    (mainData[i]["塁打数"] + shishi + mainData[i]["盗塁"] - caughtStealing) /
+                    (dasu - mainData[i]["安打"] + caughtStealing + mainData[i]["併殺打"])
+                ).toFixed(3)
+                mainData[i]["PS"] = ((mainData[i]["本塁打"] * mainData[i]["盗塁"] * 2) / (mainData[i]["本塁打"] + mainData[i]["盗塁"])).toFixed(3)
+                // PS＝(本塁打×盗塁×２)／(本塁打＋盗塁) 
 
             }
             this.calculation_WOBA_avr(mainData)
@@ -357,6 +461,16 @@ export default {
                 "ゲッツー崩れ": [],
                 "試合日": [],
                 "三割(4打数)": [],
+                "BABIP": [],
+                "NOI": [],
+                "GPA": [],
+                "ISOD": [],
+                "ISOP": [],
+                "PA/K": [],
+                "AB/HR": [],
+                "SECA": [],
+                "TA": [],
+                "PS": [],
                 "_cellVariants": []
             }
             let i = 0
@@ -436,13 +550,5 @@ td:first-child {
 }
 #offence-show .list-group {
     font-size: .5rem;
-}
-/* TODO:ちゃんと非表示にする */
-.VueTables__limit-field,
-.VueTables__search {
-    display: none  !important;
-}
-.vdp-datepicker input {
-    width: 8rem;
 }
 </style>
