@@ -283,8 +283,10 @@ export default {
             this.batters.pop()
         },
         updateDB: function (result) {
-            const directory = '/records'
-            const db = firebase.database().ref(directory)
+            // TODO: ログイン状態をみる
+            const team = "honmoku"
+            const directory = '/offence'
+            const db = firebase.database().ref(team + directory)
             db.push(result)
         }
     }

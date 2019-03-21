@@ -12,7 +12,10 @@ import 'firebase/database';
 export default {
     name: "deffence-show",
     mounted() {
-        const allRawDeffenceData = firebase.database().ref("/deffence");
+        // TODO: ログイン状態をみる
+        const team = "honmoku"
+        const directory = '/deffence'
+        const allRawDeffenceData = firebase.database().ref(team + directory)
         let deffenceDataList = []
         allRawDeffenceData.on('value', (snapshot) => {
             const deffenceData = snapshot.val()

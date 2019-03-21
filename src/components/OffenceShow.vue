@@ -289,8 +289,10 @@ export default {
             this.getData(20)
         },
         getData: function(filterNum){
-            const directory = '/records'
-            const allRawData = firebase.database().ref(directory);
+            // TODO: ログイン状態をみる
+            const team = "honmoku"
+            const directory = '/offence'
+            const allRawData = firebase.database().ref(team + directory)
             let offenceDataList = []
             allRawData.orderByChild("試合日").startAt(moment(this.startAt).format('YYYY/MM/DD')).endAt(moment(this.endAt).format('YYYY/MM/DD')).on('value', (snapshot) => {
                 const offenceData = snapshot.val()

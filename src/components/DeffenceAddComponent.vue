@@ -48,8 +48,10 @@ export default {
                 "選手名": this.deffence.name
 
             }
+            // TODO: ログイン状態をみる
+            const team = "honmoku"
             const directory = '/deffence'
-            const commentsRef = firebase.database().ref(directory)
+            const commentsRef = firebase.database().ref(team + directory)
             commentsRef.push(result)
 
             this.deffence.killCount = 0
