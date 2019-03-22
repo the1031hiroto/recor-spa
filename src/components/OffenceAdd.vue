@@ -283,8 +283,8 @@ export default {
             this.batters.pop()
         },
         updateDB: function (result) {
-            // TODO: ログイン状態をみる
-            const team = "honmoku"
+            // const team = "WSKf7MiSevOyeMp6y7iorZyt4pk2"
+            const team = this.$store.getters.user.uid
             const directory = '/offence'
             const db = firebase.database().ref(team + directory)
             db.push(result)

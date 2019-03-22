@@ -1,6 +1,6 @@
 <template>
     <div id="offence-show">
-        <h2>打撃成績</h2>
+        <h2>{{this.$store.getters.user.displayName}} 打撃成績</h2>
         <div class="row justify-content-between px-3 mb-2">
             <div class="col-xs-3">
                 <vuejs-datepicker
@@ -290,7 +290,7 @@ export default {
         },
         getData: function(filterNum){
             // TODO: ログイン状態をみる
-            const team = "honmoku"
+            const team = this.$route.params.team
             const directory = '/offence'
             const allRawData = firebase.database().ref(team + directory)
             let offenceDataList = []
@@ -514,6 +514,12 @@ export default {
             }
             this.regulationNum = maxData['試合'] * 2
             return maxData
+        }
+    },
+    watch: {
+        '$route' () {
+            // TODO: ちゃんとナビゲーションガードする。https://qiita.com/SatohJohn/items/cd7067ac64d8e45da4dd
+            this.getData()
         }
     }
 };

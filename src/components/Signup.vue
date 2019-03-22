@@ -1,9 +1,9 @@
 <template>
   <div class="signup">
     <h2>Sign up</h2>
-    <input type="text" placeholder="Username" v-model="username">
-    <input type="text" placeholder="Email" v-model="email">
-    <input type="password" placeholder="Password" v-model="password">
+    <input type="text" placeholder="チーム名" v-model="username">
+    <input type="text" placeholder="メールアドレス" v-model="email">
+    <input type="password" placeholder="パスワード" v-model="password">
     <button @click="signUp">Register</button>
     <p>Do you have an account?
       <router-link to="/signin">sign in now!!</router-link>

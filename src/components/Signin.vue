@@ -1,12 +1,10 @@
 <template>
   <div class="signin">
-    <h2>Sign in</h2>
+    <h2>ログイン</h2>
     <input type="text" placeholder="Username" v-model="username">
     <input type="password" placeholder="Password" v-model="password">
-    <button @click="signIn">Signin</button>
-    <p>You don't have an account?
-      <router-link to="/signup">create account now!!</router-link>
-    </p>
+    <button @click="signIn">ログイン</button>
+    <p><router-link to="/signup">アカウント作成</router-link></p>
   </div>
 </template>
 
@@ -25,20 +23,19 @@ export default {
     },
     methods: {
         signIn: function () {
-            firebase.auth().signInWithEmailAndPassword(this.username, this.password).then(
-                user => {
-                    // TODO: userでできるはず
-                    var user1 = firebase.auth().currentUser;
-                    user1 = user1 ? user1 : {};
-                    store.commit('onAuthStateChanged', user1);
-                    store.commit('onUserStatusChanged', user.uid ? true : false);
-                    alert('Success!')
-                this.$router.push('/')
-                },
-                err => {
-                    alert(err.message)
-                }
-            )
+          firebase.auth().signInWithEmailAndPassword(this.username, this.password)
+          .then(user => {
+              // TODO: userでできるはず
+              var user1 = firebase.auth().currentUser;
+              user1 = user1 ? user1 : {};
+              store.commit('onAuthStateChanged', user1);
+              store.commit('onUserStatusChanged', user1.uid ? true : false);
+              alert('Success login', user.displayName)
+            this.$router.push('/')
+          },
+          err => {
+              alert(err.message)
+          })
         }
     }
 }

@@ -40,11 +40,11 @@ let router =  new Router({
             name: 'DeffenceAdd',
             component: DeffenceAdd,
         },{
-            path: '/offence-show',
-            name: 'offence-show',
+            path: '/offence-show/:team',
+            name: 'OffenceShow',
             component: OffenceShow
         },{
-            path: '/deffence-show/:id',
+            path: '/deffence-show/:team',
             name: 'DeffenceShow',
             component: DeffenceShow,
         }

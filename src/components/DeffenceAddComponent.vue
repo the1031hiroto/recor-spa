@@ -48,8 +48,8 @@ export default {
                 "選手名": this.deffence.name
 
             }
-            // TODO: ログイン状態をみる
-            const team = "honmoku"
+            // const team = "WSKf7MiSevOyeMp6y7iorZyt4pk2"
+            const team = this.$store.getters.user.uid
             const directory = '/deffence'
             const commentsRef = firebase.database().ref(team + directory)
             commentsRef.push(result)
