@@ -5,27 +5,29 @@
         <p>Menu</p>
         <router-link tag="button" to="/offence-add" class="btn btn-outline-success mx-1 btn-sm">打撃追加</router-link>
         <router-link tag="button" to="/deffence-add" class="btn btn-outline-success mx-1 btn-sm">守備追加</router-link>
-        <router-link tag="button" :to="{ name: 'OffenceShow', params: { team: user.uid }}" class="btn btn-outline-success mx-1 btn-sm">打撃成績</router-link>
-        <router-link tag="button" :to="{ name: 'DeffenceShow', params: { team: user.uid }}" class="btn btn-outline-success mx-1 btn-sm">守備成績</router-link>
+        <button @click="link('OffenceShow')" class="btn btn-outline-success mx-1 btn-sm">打撃成績</button>
+        <button @click="link('DeffenceShow')" class="btn btn-outline-success mx-1 btn-sm">守備成績</button>
         <router-link tag="button" to="/" class="btn btn-outline-success mx-1 btn-sm">HOME</router-link>
         <button @click="signOut" v-if="isSignedIn">ログアウト</button>
     </div>
     <h3>他チームの成績</h3>
     <h4>打撃成績</h4>
-    <router-link :to="{ name: 'OffenceShow', params: { team: 'WSKf7MiSevOyeMp6y7iorZyt4pk2' }}" class="btn btn-outline-success mx-1 btn-sm">本牧野球大好きーズ</router-link>
-    <router-link :to="{ name: 'OffenceShow', params: { team: 'sB01dccqK5fSvXJy0wuvEXAaXwr1' }}" class="btn btn-outline-success mx-1 btn-sm">team1</router-link>
+    <button @click="link('OffenceShow', 'WSKf7MiSevOyeMp6y7iorZyt4pk2', '本牧野球大好きーズ')" class="btn btn-outline-success mx-1 btn-sm">本牧野球大好きーズ</button>
+    <button @click="link('OffenceShow', 'sB01dccqK5fSvXJy0wuvEXAaXwr1', 'team1')" class="btn btn-outline-success mx-1 btn-sm">team1</button>
     <br>
     <h4>守備成績</h4>
-    <router-link :to="{ name: 'DeffenceShow', params: { team: 'WSKf7MiSevOyeMp6y7iorZyt4pk2' }}" class="btn btn-outline-success mx-1 btn-sm">本牧野球大好きーズ</router-link>
-    <router-link :to="{ name: 'DeffenceShow', params: { team: 'sB01dccqK5fSvXJy0wuvEXAaXwr1' }}" class="btn btn-outline-success mx-1 btn-sm">team1</router-link>
+    <button @click="link('DeffenceShow', 'WSKf7MiSevOyeMp6y7iorZyt4pk2', '本牧野球大好きーズ')" class="btn btn-outline-success mx-1 btn-sm">本牧野球大好きーズ</button>
+    <button @click="link('DeffenceShow', 'sB01dccqK5fSvXJy0wuvEXAaXwr1', 'team1')" class="btn btn-outline-success mx-1 btn-sm">team1</button>
     <br>
-    <router-link tag="button" to="/signin" v-if="!isSignedIn">ログイン</router-link>
+    <div v-if="!isSignedIn">
+      成績追加する為にはログインが必要です。<router-link tag="button" to="/signin">ログイン</router-link>
+    </div>
   </div>
 </template>
 <script>
 import firebase from 'firebase/app';
 import 'firebase/auth';
-import store from "./store";
+// import store from "./store";
 
 export default {
   name: 'App',
@@ -42,8 +44,14 @@ export default {
         firebase.auth().signOut().then(() => {
             this.$router.push('/signin')
         })
-        store.commit('onAuthStateChanged', null);
-        store.commit('onUserStatusChanged', false);
+        this.$store.commit('onAuthStateChanged', null);
+        this.$store.commit('onUserStatusChanged', false);
+        this.$store.commit('order', []);
+    },
+    link: function (to, uid, team) {
+      this.$store.uid = uid ? uid : this.user.uid
+      const teamName = team ? team : this.user.displayName
+      this.$router.replace({ name: to, params: { team: teamName }})
     }
   }
 };

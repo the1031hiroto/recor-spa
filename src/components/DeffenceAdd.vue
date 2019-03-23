@@ -11,33 +11,40 @@
 
 <script>
 import DeffenceAddComponent from './DeffenceAddComponent.vue'
+import firebase from 'firebase/app';
+import 'firebase/database';
 
 export default {
     components: {
         DeffenceAddComponent,
     },
     name: "deffence-add",
+    mounted() {
+        this.getMembers()
+    },
     data() {
         return {
-            deffences: [
-                { id: 1, name: 'ひろと', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 2, name: '大志', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 3, name: '龍', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 4, name: '達也', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 5, name: '三好', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 6, name: 'バタニキ', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 7, name: '隼人', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 8, name: '先生', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 9, name: 'りょーま', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 10, name: '涼', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 11, name: 'さいち', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 12, name: 'ゆーや', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 13, name: '岡さん', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 14, name: '小僧', killSupportCount: 0, killCount: 0, errorCount: 0, },
-                { id: 15, name: '航', killSupportCount: 0, killCount: 0, errorCount: 0, }
-            ],
+            deffences: [],
             position: 0,
         };
+    },
+    methods: {
+        getMembers: function () {
+            const team = this.$store.getters.user.uid
+            const directory = '/members'
+            const membersList = firebase.database().ref(team + directory)
+            membersList.on('value', (snapshot) => {
+                const members = Object.entries(snapshot.val()).map(([key, value]) => ({
+                    '背番号': key,
+                    'name': value['選手名'],
+                    'killSupportCount': 0,
+                    'killCount': 0,
+                    'errorCount': 0
+                }))
+
+                this.deffences = members
+            })
+        }
     }
 };
 </script>

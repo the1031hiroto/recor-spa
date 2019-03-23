@@ -290,7 +290,7 @@ export default {
         },
         getData: function(filterNum){
             // TODO: ログイン状態をみる
-            const team = this.$route.params.team
+            const team = this.$store.uid
             const directory = '/offence'
             const allRawData = firebase.database().ref(team + directory)
             let offenceDataList = []
@@ -387,7 +387,6 @@ export default {
                     (dasu - mainData[i]["安打"] + caughtStealing + mainData[i]["併殺打"])
                 ).toFixed(3)
                 mainData[i]["PS"] = ((mainData[i]["本塁打"] * mainData[i]["盗塁"] * 2) / (mainData[i]["本塁打"] + mainData[i]["盗塁"])).toFixed(3)
-                // PS＝(本塁打×盗塁×２)／(本塁打＋盗塁) 
 
             }
             this.calculation_WOBA_avr(mainData)
@@ -516,11 +515,9 @@ export default {
             return maxData
         }
     },
-    watch: {
-        '$route' () {
-            // TODO: ちゃんとナビゲーションガードする。https://qiita.com/SatohJohn/items/cd7067ac64d8e45da4dd
-            this.getData()
-        }
+    beforeRouteUpdate (to, from , next) {
+        this.getData()
+        next()
     }
 };
 </script>

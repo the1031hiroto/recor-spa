@@ -1,12 +1,14 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import createPersistedState from 'vuex-persistedstate'
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
     user: {},
-    status: false
+    status: false,
+    order: {}
   },
   mutations: {
     onAuthStateChanged(state, user) {
@@ -22,6 +24,10 @@ export default new Vuex.Store({
     },
     isSignedIn(state) {
       return state.status;
+    },
+    order(state) {
+      return state.order;
     }
-  }
+  },
+  plugins: [createPersistedState()]
 });

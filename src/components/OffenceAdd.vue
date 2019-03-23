@@ -2,20 +2,11 @@
     <div id="offence-add">
         <h2>打撃追加</h2>
         <div class="border-bottom my-2 py-2">
-            <h3>打順</h3>
-            <draggable :list="batters" class="dragArea" element="ul">
-                <li v-for="(batter, index) in batters" :key="index">{{ batter }}</li>
-            </draggable>
-            <button @click="reduceBatter" type="button" class="btn btn-outline-warning">最後のバッターを除外</button>
-            <br>
-            <button @click="isConfirmOrder = true" type="button" class="btn btn-outline-success my-1">打順確定</button>
-        </div>
-        <div class="border-bottom my-2 py-2">
             <h3>打撃成績</h3>
             <form @submit.prevent="validate">
                 <select v-model="batter" class="custom-select my-1" required>
-                    <option v-for="(batter, index) in batters" v-bind:value="batter" :key="index">
-                        {{ batter }}
+                    <option v-for="(batter, index) in batters" v-bind:value="batter['選手名']" :key="index">
+                        {{ batter['選手名'] }}
                     </option>
                 </select>
                 <select v-model="hit" class="custom-select my-1">
@@ -57,8 +48,8 @@
             <h3>その他</h3>
             <form @submit.prevent="isConfirmOther = true">
                 <select v-model="batter" class="custom-select my-1" required>
-                    <option v-for="(batter, index) in batters" v-bind:value="batter" :key="index">
-                        {{ batter }}
+                    <option v-for="(batter, index) in batters" v-bind:value="batter['選手名']" :key="index">
+                        {{ batter['選手名'] }}
                     </option>
                 </select>
 
@@ -95,15 +86,6 @@
                 <button @click="isConfirmOther = false" type="button" class="btn btn-outline-warning mx-1">閉じる</button>
             </div>
         </div>
-        <div v-if="isConfirmOrder" class="modal1">
-            <div>
-                <ul class="list-group mb-4">
-                    <li v-for="(batter, index) in batters" :key="index">{{ batter }}</li>
-                </ul>
-                <button class="btn btn-primary mx-1" @click="submitOrder">確定</button>
-                <button @click="isConfirmOrder = false" type="button" class="btn btn-outline-warning mx-1">閉じる</button>
-            </div>
-        </div>
         <div v-if="message" class="modal1">
             <div>
                 {{ message }}
@@ -117,35 +99,24 @@
 <script>
 import firebase from 'firebase/app';
 import 'firebase/database';
-import draggable from 'vuedraggable'
 import moment from 'moment'
 
 export default {
-    components: {
-        draggable,
-    },
     name: "offence-add",
+    mounted() {
+        const team = this.$store.getters.user.uid
+        const directory = '/members'
+        const membersList = firebase.database().ref(team + directory)
+        membersList.on('value', (snapshot) => {
+            this.batters = Object.values(snapshot.val())
+        })
+
+        this.batters = this.$store.state.order
+    },
     data() {
         return {
             message: "",
-            batters: [
-                'ひろと',
-                '大志',
-                '龍',
-                '達也',
-                '三好',
-                '先生',
-                'バタニキ',
-                'りょーま',
-                '涼',
-                '隼人',
-                'さいち',
-                'ゆーや',
-                '岡さん',
-                '航',
-                '小僧',
-                '浅野',
-            ],
+            batters: [],
             hitOptions: [
                 { text: '出塁', value: '' },
                 { text: '1塁打', value: '1塁打' },
@@ -212,7 +183,6 @@ export default {
             daten: 0,
             isConfirm: false,
             isConfirmOther: false,
-            isConfirmOrder: false,
             showData: [0],
             other: ""
         };
@@ -266,21 +236,6 @@ export default {
 
             this.other = ""
             this.isConfirmOther = false
-        },
-        submitOrder: function () {
-            let i = 0
-            for (i in this.batters) {
-                let result = {
-                    "試合日": moment(new Date()).format('YYYY/MM/DD'),
-                    "選手名": this.batters[i],
-                    "試合": 1
-                }
-                this.updateDB(result)
-            }
-            this.isConfirmOrder = false
-        },
-        reduceBatter: function () {
-            this.batters.pop()
         },
         updateDB: function (result) {
             // const team = "WSKf7MiSevOyeMp6y7iorZyt4pk2"

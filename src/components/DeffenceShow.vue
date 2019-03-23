@@ -1,6 +1,6 @@
 <template>
     <div id="deffence-show">
-        <h2>守備成績</h2>
+        <h2>{{this.$route.params.team}}守備成績</h2>
         <b-table :items="deffenceData" :fields="columns" :sort-by.sync="sortBy" striped hover responsive small />
     </div>
 </template>
@@ -30,7 +30,7 @@ export default {
     },
     methods: {
         getData: function(){
-            const team = this.$route.params.team
+            const team = this.$store.uid
             const directory = '/deffence'
             const allRawDeffenceData = firebase.database().ref(team + directory)
             let deffenceDataList = []
@@ -62,11 +62,9 @@ export default {
             })
         }
     },
-    watch: {
-        '$route' () {
-            // TODO: ちゃんとナビゲーションガードする。https://qiita.com/SatohJohn/items/cd7067ac64d8e45da4dd
-            this.getData()
-        }
+    beforeRouteUpdate (to, from , next) {
+        this.getData()
+        next()
     }
 };
 </script>
