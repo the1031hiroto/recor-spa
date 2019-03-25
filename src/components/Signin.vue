@@ -14,46 +14,32 @@ import 'firebase/auth';
 import store from "../store";
 
 export default {
-    name: 'Signin',
-    data: function () {
-        return {
-        username: '',
-        password: ''
-        }
-    },
-    methods: {
-        signIn: function () {
-          firebase.auth().signInWithEmailAndPassword(this.username, this.password)
-          .then(user => {
-              // TODO: userでできるはず
-              var user1 = firebase.auth().currentUser;
-              user1 = user1 ? user1 : {};
-              store.commit('onAuthStateChanged', user1);
-              store.commit('onUserStatusChanged', user1.uid ? true : false);
-              alert('Success login', user.displayName)
-            this.$router.push('/')
-          },
-          err => {
-              alert(err.message)
-          })
-        }
+  name: 'Signin',
+  data: function () {
+      return {
+      username: '',
+      password: ''
+      }
+  },
+  methods: {
+    signIn: function () {
+      firebase.auth().signInWithEmailAndPassword(this.username, this.password)
+      .then(user => {
+        user = firebase.auth().currentUser;
+        store.commit('onAuthStateChanged', user);
+        store.commit('onUserStatusChanged', user.uid ? true : false);
+        this.$router.push('/')
+      },
+      err => {
+          alert(err.message)
+      })
     }
+  }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1, h2 {
-  font-weight: normal;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
 a {
   color: #42b983;
 }

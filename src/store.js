@@ -8,7 +8,8 @@ export default new Vuex.Store({
   state: {
     user: {},
     status: false,
-    order: {}
+    order: {},
+    versus: {}
   },
   mutations: {
     onAuthStateChanged(state, user) {

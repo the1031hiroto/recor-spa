@@ -308,7 +308,7 @@ export default {
                         dataColumns.map(item => { element[item] += current[item] && element['打席数'] < filterNum ? current[item] : 0 });
                     } else {
                         let data = { '選手名' : current['選手名'] }
-                        dataColumns.forEach(item => { data[item] = current[item] });
+                        dataColumns.forEach(item => { data[item] = current[item] ? current[item] : 0 });
                         result.push(data)
                     }
                     return result

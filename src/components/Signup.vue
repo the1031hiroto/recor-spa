@@ -4,10 +4,7 @@
     <input type="text" placeholder="チーム名" v-model="username">
     <input type="text" placeholder="メールアドレス" v-model="email">
     <input type="password" placeholder="パスワード" v-model="password">
-    <button @click="signUp">Register</button>
-    <p>Do you have an account?
-      <router-link to="/signin">sign in now!!</router-link>
-    </p>
+    <button @click="signUp">登録</button>
   </div>
 </template>
 
@@ -28,15 +25,15 @@ export default {
     signUp: function () {
       firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
         .then(user => {
-            var user1 = firebase.auth().currentUser;
-            user1.updateProfile({
-                displayName: this.username,
-                // photoURL: "https://example.com/jane-q-user/profile.jpg"
-            }).then(function() {
-                alert('Create account: ', user.email)
-            }).catch(function(error) {
-                alert(error.message)
-            });
+          user = firebase.auth().currentUser;
+          user.updateProfile({
+              displayName: this.username,
+              // photoURL: "https://example.com/jane-q-user/profile.jpg"
+          }).then(function() {
+              this.$router.push('/')
+          }).catch(function(error) {
+              alert(error.message)
+          });
         })
         .catch(error => {
           alert(error.message)
@@ -48,20 +45,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1, h2 {
-  font-weight: normal;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
 .signup {
   margin-top: 20px;
 

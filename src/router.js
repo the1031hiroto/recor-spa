@@ -6,6 +6,7 @@ import OffenceAdd from '@/components/OffenceAdd.vue'
 import DeffenceAdd from '@/components/DeffenceAdd'
 import OffenceShow from '@/components/OffenceShow'
 import DeffenceShow from '@/components/DeffenceShow'
+import PitcherShow from '@/components/PitcherShow'
 import Signup from '@/components/Signup'
 import Signin from '@/components/Signin'
 import Home from '@/components/Home'
@@ -33,7 +34,7 @@ let router =  new Router({
         },
         {
             path: '/offence-add',
-            name: 'offence-add',
+            name: 'OffenceAdd',
             component: OffenceAdd,
             meta: { requiresAuth: true }
         },{
@@ -49,7 +50,11 @@ let router =  new Router({
             path: '/deffence-show/:team',
             name: 'DeffenceShow',
             component: DeffenceShow,
-        }
+        },{
+          path: '/pitcher-show/:team',
+          name: 'PitcherShow',
+          component: PitcherShow,
+      }
     ]
 })
 

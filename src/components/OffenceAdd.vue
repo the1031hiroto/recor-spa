@@ -22,8 +22,8 @@
                 </select>
 
                 <select v-model="onBall" class="custom-select my-1">
-                    <option v-for="(onBallOption, index) in onBallOptions" v-bind:value="onBallOption.value" :key="index">
-                        {{ onBallOption.text }}
+                    <option v-for="(onBallOption, index) in onBallOptions" v-bind:value="onBallOption" :key="index">
+                        {{ onBallOption.value }}
                     </option>
                 </select>
 
@@ -68,7 +68,7 @@
                     <li v-if="batter" class="list-group-item">バッター：{{ batter }}</li>
                     <li v-if="hit" class="list-group-item">ヒット：{{ hit }}</li>
                     <li v-if="out" class="list-group-item">アウト：{{ out }}</li>
-                    <li v-if="onBall" class="list-group-item">打球：{{ onBall }}</li>
+                    <li v-if="onBall" class="list-group-item">打球：{{ onBall.value }}</li>
                     <li v-if="optionResult.length" class="list-group-item">オプション：{{ optionResult }}</li>
                     <li v-if="daten" class="list-group-item">打点：{{ daten }}</li>
                 </ul>
@@ -112,6 +112,13 @@ export default {
         })
 
         this.batters = this.$store.state.order
+
+        const versus = this.$store.state.versus.uid
+        const directoryOrder = '/order'
+        const orders = firebase.database().ref(versus + directoryOrder)
+        orders.on('value', (snapshot) => {
+            this.versusOrder = Object.values(snapshot.val())
+        })
     },
     data() {
         return {
@@ -139,22 +146,22 @@ export default {
             ],
             onBallOptions: [
                 { text: '打球', value: '' },
-                { text: 'ピッチャー', value: 'ピッチャー' },
-                { text: 'キャッチャー', value: 'キャッチャー' },
-                { text: '1塁', value: '1塁' },
-                { text: '1塁線', value: '1塁線' },
-                { text: '1,2塁間', value: '2塁間' },
-                { text: '2塁', value: '2塁' },
-                { text: '2遊間', value: '2遊間' },
-                { text: 'ショート', value: 'ショート' },
-                { text: '3遊間', value: '3遊間' },
-                { text: '3塁', value: '3塁' },
-                { text: '3塁線', value: '3塁線' },
-                { text: 'ライト', value: 'ライト' },
-                { text: '右中間', value: '右中間' },
-                { text: 'センター', value: 'センター' },
-                { text: '左中間', value: 'ラ左中間イト' },
-                { text: 'レフト', value: 'レフト' }
+                { id: 0, value: 'ピッチャー' },
+                { id: 1, value: 'キャッチャー' },
+                { id: 2, value: '1塁' },
+                { value: '1塁線' },
+                { value: '2塁間' },
+                { id: 3, value: '2塁' },
+                { value: '2遊間' },
+                { id: 5, value: 'ショート' },
+                { value: '3遊間' },
+                { id: 4, value: '3塁' },
+                { value: '3塁線' },
+                { id: 8, value: 'ライト' },
+                { value: '右中間' },
+                { id: 7, value: 'センター' },
+                { value: 'ラ左中間イト' },
+                { id: 6, value: 'レフト' }
             ],
             recordOptions: [
                 { text: '得点圏', value: '得点圏' },
@@ -184,7 +191,8 @@ export default {
             isConfirm: false,
             isConfirmOther: false,
             showData: [0],
-            other: ""
+            other: "",
+            versusOrder: []
         };
     },
     methods: {
@@ -205,7 +213,7 @@ export default {
             }
 
             if ((this.hit != "四球" || this.hit != "死球" || this.out != "三振") && this.onBall) {
-                result["打球"] = this.onBall
+                result["打球"] = this.onBall.value
             }
 
             if (this.optionResult) {
@@ -217,6 +225,10 @@ export default {
             }
 
             this.updateDB(result)
+            this.updateVersusPitcher()
+            if (this.out || this.hit != "失策出" || this.hit != "ゲッツー崩れ") {
+                this.defineVersusDeffence()
+            }
 
             this.hit = ""
             this.onBall = ""
@@ -238,40 +250,97 @@ export default {
             this.isConfirmOther = false
         },
         updateDB: function (result) {
-            // const team = "WSKf7MiSevOyeMp6y7iorZyt4pk2"
             const team = this.$store.getters.user.uid
             const directory = '/offence'
             const db = firebase.database().ref(team + directory)
+            db.push(result)
+        },
+        defineVersusDeffence: function () {
+            let position = ''
+            let name = ''
+            let killSupportCount = 0
+            let killCount = 0
+            let errorCount = 0
+            if (this.out != '三振') {
+                position = this.onBall.value
+                name = this.versusOrder[this.onBall.id]['選手名']
+            }
+
+            if (this.out == '三振') {
+                position =  'キャッチャー'
+                name = this.versusOrder[2]['選手名']
+                killCount = 1
+            } else if (this.out == 'フライアウト' || this.out == '犠飛') {
+                killCount = 1
+            } else {
+                // TODO:併殺打
+                killSupportCount = 1
+                const b = {
+                    "試合日": moment(new Date()).format('YYYY/MM/DD'),
+                    "ポジション": '1塁',
+                    "選手名": this.versusOrder[2]['選手名'],
+                    "刺殺": 1,
+                    "捕殺": 0,
+                    "エラー": 0
+                }
+                this.updateVersusDB(b)
+            }
+            if (this.hit == '失策出') {
+                // TODO:ゲッツー崩れ
+                errorCount = 1
+            }
+
+            let a = {
+                "試合日": moment(new Date()).format('YYYY/MM/DD'),
+                "ポジション": position,
+                "選手名": name,
+                "捕殺": killSupportCount,
+                "刺殺": killCount,
+                "エラー": errorCount
+            }
+            this.updateVersusDB(a)
+        },
+        updateVersusDB: function (result) {
+            const versus = this.$store.state.versus.uid
+            const directory = '/deffence'
+            const db = firebase.database().ref(versus + directory)
+            db.push(result)
+        },
+        updateVersusPitcher: function () {
+            let result = {
+                "試合日": moment(new Date()).format('YYYY/MM/DD'),
+                "選手名": this.versusOrder[0]['選手名']
+            }
+            if (this.hit == "1塁打" || this.hit == "2塁打" || this.hit == "3塁打" || this.hit == "本塁打") {
+                result["被安打"] = 1
+            }
+            if (this.hit == "本塁打") {
+                result["本塁打"] = 1
+            }
+            if (this.hit == "四球") {
+                result["与四球"] = 1
+            }
+            if (this.hit == "死球") {
+                result["与死球"] = 1
+            }
+            if (this.out == "ゴロアウト" || this.out == "犠打") {
+                result["ゴロアウト"] = 1
+            }
+            if (this.out == "フライアウト" || this.out == "犠飛") {
+                result["フライアウト"] = 1
+            }
+            if (this.out == "併殺打") {
+                result["併殺打"] = 1
+            }
+            if (this.out == "三振") {
+                result["奪三振"] = 1
+            }
+            const versus = this.$store.state.versus.uid
+            const directory = '/pitcher'
+            const db = firebase.database().ref(versus + directory)
             db.push(result)
         }
     }
 };
 
 </script>
-<style>
-/*modal*/
-.modal1 {
-    position: fixed;
-    z-index: 9998;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, .5);
-    display: table;
-    transition: opacity .3s ease;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.modal1 div {
-    padding: 2rem;
-    background: white;
-}
-.dragArea {
-    width: 10rem;
-}
-.dragArea li {
-    list-style-type: decimal;
-}
-</style>

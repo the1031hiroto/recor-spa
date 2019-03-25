@@ -1,12 +1,14 @@
 <template>
-  <div class="hello">
+  <div id="home" v-if="isSignedIn">
     <h2>チーム名： {{ user.displayName }}</h2>
     <form @submit.prevent="isConfirm = true">
       <input type="text" class="form-control" placeholder="選手名" v-model="name" required>
       <input type="number" class="form-control" placeholder="背番号" v-model="uniNum" required>
       <button type="submit" class="btn btn-outline-primary my-1">選手追加</button>
     </form>
-    <div class="border-bottom my-2 py-2">
+    <button v-if="!isGameOn" @click="isGameOn = true" class="btn btn-outline-primary my-1">試合開始</button>
+
+    <div v-if="isGameOn" class="border-bottom my-2 py-2">
       <h3>オーダー</h3>
       <draggable :list="batters" class="dragArea" element="ul">
           <li v-for="(batter, index) in batters" :key="index">{{ batter['選手名'] }}</li>
@@ -15,23 +17,52 @@
       <br>
       <button @click="isConfirmOrder = true" type="button" class="btn btn-outline-success my-1">オーダー確定</button>
     </div>
-    <div v-if="isConfirm" class="modal1">
-      <div>
-        <ul class="list-group mb-4">
-            <li class="list-group-item">選手名：{{ name }}</li>
-            <li class="list-group-item">背番号：{{ uniNum }}</li>
-        </ul>
-        <button class="btn btn-primary mx-1" @click="submit">確定</button>
-        <button @click="isConfirm = false" type="button" class="btn btn-outline-warning mx-1">閉じる</button>
-      </div>
+
+    <div v-if="isConfirmOrder" class="border-bottom my-2 py-2">
+      <h3>守備位置</h3>
+      <draggable :list="deffences" class="dragArea" element="ul">
+          <li v-for="(deffence, index) in deffences" :key="index">{{ deffence['選手名'] }}</li>
+      </draggable>
+      <button @click="reduceDeffence" type="button" class="btn btn-outline-warning">最後の守備を除外</button>
+      <br>
+      <button @click="isConfirmDeffence = true" type="button" class="btn btn-outline-success my-1">守備位置確定</button>
     </div>
-    <div v-if="isConfirmOrder" class="modal1">
+
+    <div v-if="isConfirmDeffence" class="border-bottom my-2 py-2">
+      <h3>対戦相手</h3>
+      <select v-model="versus" class="custom-select my-1">
+        <option v-for="(team, index) in teamList" v-bind:value="team" :key="index">
+            {{ team.name }}
+        </option>
+      </select>
+      <br>
+      <button @click="isConfirmGame = true" type="button" class="btn btn-outline-success my-1">対戦相手確定</button>
+    </div>
+
+    <div v-if="isConfirmGame" class="modal1">
       <div>
+        <p class="list-group-item">対戦相手{{ versus.name }}</p>
+        <P>オーダー</P>
         <ul class="list-group mb-4">
             <li v-for="(batter, index) in batters" :key="index">{{ batter['選手名'] }}</li>
         </ul>
-        <button class="btn btn-primary mx-1" @click="submitOrder">確定</button>
-        <button @click="isConfirmOrder = false" type="button" class="btn btn-outline-warning mx-1">閉じる</button>
+        <P>守備位置</P>
+        <ul class="list-group mb-4">
+            <li v-for="(deffence, index) in deffences" :key="index">{{ deffence['選手名'] }}</li>
+        </ul>
+        <button class="btn btn-primary mx-1" @click="submitGame">確定</button>
+        <button @click="isConfirmGame = false" type="button" class="btn btn-outline-warning mx-1">閉じる</button>
+      </div>
+    </div>
+
+    <div v-if="isConfirm" class="modal1">
+      <div>
+        <ul class="list-group mb-4">
+          <li class="list-group-item">選手名：{{ name }}</li>
+          <li class="list-group-item">背番号：{{ uniNum }}</li>
+        </ul>
+        <button class="btn btn-primary mx-1" @click="submit">確定</button>
+        <button @click="isConfirm = false" type="button" class="btn btn-outline-warning mx-1">閉じる</button>
       </div>
     </div>
   </div>
@@ -41,34 +72,60 @@
 import firebase from 'firebase/app';
 import 'firebase/database';
 import draggable from 'vuedraggable'
+import moment from 'moment'
 
 export default {
+  name: 'Home',
   components: {
     draggable,
   },
   computed: {
+    isSignedIn() {
+      return this.$store.getters.isSignedIn;
+    },
     user() {
         const displayName = this.$store.getters.user ? this.$store.getters.user : 'No Name'
         return displayName;
     },
 
   },
-  name: 'Home',
   mounted() {
-    const team = this.$store.getters.user.uid
-    const directory = '/members'
-    const membersList = firebase.database().ref(team + directory)
-    membersList.on('value', (snapshot) => {
-        this.batters = Object.values(snapshot.val())
-    })
+    if (this.isSignedIn) {
+      const team = this.$store.getters.user.uid
+      const directory = '/members'
+      const membersList = firebase.database().ref(team + directory)
+      membersList.on('value', (snapshot) => {
+        const members = Object.values(snapshot.val())
+        this.batters = Array.from(members);
+        this.deffences = Array.from(members);
+      })
+    }
   },
   data () {
       return {
         isConfirm: false,
+        isConfirmGame: false,
+        isConfirmDeffence: false,
+        isGameOn: false,
         isConfirmOrder: false,
+        isConfirmVersus: false,
         batters: [],
+        deffences: [],
         name: '',
-        uniNum: ''
+        uniNum: '',
+        versus: '',
+        teamList: [
+          {
+            name: '対戦相手なし',
+            uid: ''
+          },{
+            name: 'グローリアス',
+            uid: 'sB01dccqK5fSvXJy0wuvEXAaXwr1'
+          },{
+            name: 'dolphins',
+            uid: 'StZLsc4e6BccfgBM1pVlNqlgLDj2'
+          }
+        ]
       }
   },
   methods: {
@@ -81,29 +138,52 @@ export default {
       // const team = "WSKf7MiSevOyeMp6y7iorZyt4pk2"
       const team = this.$store.getters.user.uid
       const directory = '/members'
-      const commentsRef = firebase.database().ref(team + directory)
-      commentsRef.push(result)
+      const db = firebase.database().ref(team + directory)
+      db.push(result)
 
       this.name = ''
       this.uniNum = ''
       this.isConfirm = false
     },
-    submitOrder: function () {
+    submitGame: function () {
+      this.$store.state.versus = this.versus
       this.$store.state.order = this.batters
-      // let i = 0
-      // for (i in this.batters) {
-      //     let result = {
-      //         "試合日": moment(new Date()).format('YYYY/MM/DD'),
-      //         "選手名": this.batters[i],
-      //         "試合": 1
-      //     }
-      //     this.updateDB(result)
-      // }
-      this.isConfirmOrder = false
+      let i = 0
+      for (i in this.batters) {
+        let result = {
+            "試合日": moment(new Date()).format('YYYY/MM/DD'),
+            "選手名": this.batters[i]['選手名'],
+            "試合": 1
+        }
+        // this.updateDB(result)
+        const team = this.$store.getters.user.uid
+        const directory = '/offence'
+        const db = firebase.database().ref(team + directory)
+        db.push(result)
+      }
+
+      const versus = this.$store.getters.user.uid
+      const directory = '/order'
+      const db = firebase.database().ref(versus + directory)
+      db.set(this.deffences)
+
+      this.$router.push({ name: 'OffenceAdd' })
     },
     reduceBatter: function () {
       this.batters.pop()
     },
+    reduceDeffence: function () {
+      this.deffences.pop()
+    },
   },
 }
 </script>
+<style>
+.dragArea {
+    width: 10rem;
+}
+.dragArea li,
+.modal1 li {
+    list-style-type: decimal;
+}
+</style>
