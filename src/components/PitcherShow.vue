@@ -18,6 +18,7 @@ const dataColumns = [
     "フライアウト",
     "奪三振",
     "併殺打",
+    "失策出"
 ]
 
 export default {
@@ -37,6 +38,7 @@ export default {
                 { key: 'ゴロアウト', sortable: true },
                 { key: 'フライアウト', sortable: true },
                 { key: '奪三振', sortable: true },
+                { key: '失策出', sortable: true },
                 { key: 'WHIP', sortable: true },
                 { key: 'FIP', sortable: true }
             ],
@@ -71,7 +73,8 @@ export default {
                 }, [])
 
                 this.pitcherData .map(item => {
-                    item['投球回'] = ((item['ゴロアウト'] + item['フライアウト'] + item['奪三振'] + (item['併殺打'] * 2)) / 3).toFixed(3)
+                    const ining = (item['ゴロアウト'] + item['フライアウト'] + item['奪三振'] + (item['併殺打'] * 2)) / 3
+                    item['投球回'] = Math.floor(ining * 100) / 100
                     item['WHIP'] = ((item['被安打'] + item['与四球'] + item['与死球']) / item['投球回']).toFixed(3)
                     item['FIP'] = (( item['本塁打'] * 13 + ( item['与四球'] + item['与死球'] ) * 3 - ( item['奪三振'] * 2 )) / ( item['投球回'] + 3.12 )).toFixed(3)
                 });

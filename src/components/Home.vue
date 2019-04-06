@@ -124,6 +124,9 @@ export default {
           },{
             name: 'dolphins',
             uid: 'StZLsc4e6BccfgBM1pVlNqlgLDj2'
+          },{
+            name: '本牧野球大好きーズ',
+            uid: 'WSKf7MiSevOyeMp6y7iorZyt4pk2'
           }
         ]
       }

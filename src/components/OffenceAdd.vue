@@ -226,7 +226,7 @@ export default {
 
             this.updateDB(result)
             this.updateVersusPitcher()
-            if (this.out || this.hit != "失策出" || this.hit != "ゲッツー崩れ") {
+            if (this.out || this.hit == "失策出" || this.hit == "ゲッツー崩れ") {
                 this.defineVersusDeffence()
             }
 

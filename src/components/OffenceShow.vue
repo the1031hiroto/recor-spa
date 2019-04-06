@@ -1,6 +1,6 @@
 <template>
     <div id="offence-show">
-        <h2>{{this.$store.getters.user.displayName}} 打撃成績</h2>
+        <h2>{{ this.$route.params.team }} 打撃成績</h2>
         <div class="row justify-content-between px-3 mb-2">
             <div class="col-xs-3">
                 <vuejs-datepicker
