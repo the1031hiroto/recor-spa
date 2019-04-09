@@ -12,19 +12,25 @@
     </div>
     <h3>成績一覧</h3>
     <h4>打撃成績</h4>
-    <button @click="link('OffenceShow', 'WSKf7MiSevOyeMp6y7iorZyt4pk2', '本牧野球大好きーズ')" class="btn btn-outline-success mx-1 btn-sm">本牧野球大好きーズ</button>
-    <button @click="link('OffenceShow', 'sB01dccqK5fSvXJy0wuvEXAaXwr1', 'グローリアス')" class="btn btn-outline-success mx-1 btn-sm">グローリアス</button>
-    <button @click="link('OffenceShow', 'StZLsc4e6BccfgBM1pVlNqlgLDj2', 'ドルフィンズ')" class="btn btn-outline-success mx-1 btn-sm">ドルフィンズ</button>
+    <button v-for="(team, index) in teamList" :key="`first-${index}`"
+      @click="link('OffenceShow', team['uid'], team['チーム名'])"
+      class="btn btn-outline-success mx-1 btn-sm">
+      {{ team['チーム名'] }}
+    </button>
     <br>
     <h4>守備成績</h4>
-    <button @click="link('DeffenceShow', 'WSKf7MiSevOyeMp6y7iorZyt4pk2', '本牧野球大好きーズ')" class="btn btn-outline-success mx-1 btn-sm">本牧野球大好きーズ</button>
-    <button @click="link('DeffenceShow', 'sB01dccqK5fSvXJy0wuvEXAaXwr1', 'グローリアス')" class="btn btn-outline-success mx-1 btn-sm">グローリアス</button>
-    <button @click="link('DeffenceShow', 'StZLsc4e6BccfgBM1pVlNqlgLDj2', 'ドルフィンズ')" class="btn btn-outline-success mx-1 btn-sm">ドルフィンズ</button>
+    <button v-for="(team, index) in teamList" :key="`second-${index}`"
+      @click="link('DeffenceShow', team['uid'], team['チーム名'])"
+      class="btn btn-outline-success mx-1 btn-sm">
+      {{ team['チーム名'] }}
+    </button>
     <br>
     <h4>投手成績</h4>
-    <button @click="link('PitcherShow', 'WSKf7MiSevOyeMp6y7iorZyt4pk2', '本牧野球大好きーズ')" class="btn btn-outline-success mx-1 btn-sm">本牧野球大好きーズ</button>
-    <button @click="link('PitcherShow', 'sB01dccqK5fSvXJy0wuvEXAaXwr1', 'グローリアス')" class="btn btn-outline-success mx-1 btn-sm">グローリアス</button>
-    <button @click="link('PitcherShow', 'StZLsc4e6BccfgBM1pVlNqlgLDj2', 'ドルフィンズ')" class="btn btn-outline-success mx-1 btn-sm">ドルフィンズ</button>
+    <button v-for="(team, index) in teamList" :key="`third-${index}`"
+      @click="link('PitcherShow', team['uid'], team['チーム名'])"
+      class="btn btn-outline-success mx-1 btn-sm">
+      {{ team['チーム名'] }}
+    </button>
     <br>
     <div v-if="!isSignedIn">
       成績追加する為にはログインが必要です。<router-link tag="button" to="/signin">ログイン</router-link>
@@ -38,6 +44,17 @@ import 'firebase/auth';
 
 export default {
   name: 'App',
+  mounted() {
+    const teamList = firebase.database().ref('/teams')
+    teamList.on('value', (snapshot) => {
+      this.teamList = Object.values(snapshot.val())
+    })
+  },
+  data () {
+      return {
+        teamList: []
+      }
+  },
   computed: {
     user() {
         return this.$store.getters.user;

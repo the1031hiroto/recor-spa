@@ -208,11 +208,11 @@ export default {
 
             this.hit? result[this.hit] = 1 : result[this.out] = 1
 
-            if (this.hit != "四球" || this.hit != "死球" || this.out != "犠打" || this.out != "犠飛") {
+            if (!(this.hit == "四球" || this.hit == "死球" || this.out == "犠打" || this.out != "犠飛")) {
                 result["打数"] = 1
             }
 
-            if ((this.hit != "四球" || this.hit != "死球" || this.out != "三振") && this.onBall) {
+            if (!(this.hit == "四球" || this.hit == "死球" || this.out == "三振") && this.onBall) {
                 result["打球"] = this.onBall.value
             }
 
@@ -225,9 +225,12 @@ export default {
             }
 
             this.updateDB(result)
-            this.updateVersusPitcher()
-            if (this.out || this.hit == "失策出" || this.hit == "ゲッツー崩れ") {
-                this.defineVersusDeffence()
+            if (this.$store.state.versus.uid) {
+                this.updateVersusPitcher()
+
+                if (this.out || this.hit == "失策出" || this.hit == "ゲッツー崩れ") {
+                    this.defineVersusDeffence()
+                }
             }
 
             this.hit = ""

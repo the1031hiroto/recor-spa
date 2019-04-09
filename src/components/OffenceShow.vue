@@ -325,7 +325,7 @@ export default {
                 const shishi = mainData[i]["四球"] + mainData[i]["死球"]
                 mainData[i]["安打"] = mainData[i]["1塁打"] + mainData[i]["2塁打"] + mainData[i]["3塁打"] + mainData[i]["本塁打"]
                 mainData[i]["塁打数"] = mainData[i]["1塁打"] + mainData[i]["2塁打"] * 2 + mainData[i]["3塁打"] * 3 + mainData[i]["本塁打"]* 4
-                mainData[i]["打率"] = Math.floor(mainData[i]["安打"] / dasu * 100) / 100
+                mainData[i]["打率"] = Math.floor(mainData[i]["安打"] / dasu * 1000) / 1000
                 mainData[i]["三割(4打数)"] = this.calculate_tree_ratio(mainData[i]["安打"], dasu)
                 const x = (mainData[i]["安打"] + shishi) / (dasu + shishi + mainData[i]["犠飛"] + mainData[i]["犠打"])
                 mainData[i]["出塁率"] = Math.floor(x * 100) / 100

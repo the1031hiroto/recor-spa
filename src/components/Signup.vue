@@ -26,13 +26,22 @@ export default {
       firebase.auth().createUserWithEmailAndPassword(this.email, this.password)
         .then(user => {
           user = firebase.auth().currentUser;
+          const directory = 'teams'
+          const db = firebase.database().ref(directory)
+          const result = {
+            "チーム名": this.username,
+            "uid": user.uid
+          }
+          db.push(result)
           user.updateProfile({
               displayName: this.username,
               // photoURL: "https://example.com/jane-q-user/profile.jpg"
           }).then(function() {
-              this.$router.push('/')
+            // FIXME ルートがないって怒られる thisがない
+            // console.log('HELLO')
+            this.$router.push('/')
           }).catch(function(error) {
-              alert(error.message)
+            alert(error.message)
           });
         })
         .catch(error => {

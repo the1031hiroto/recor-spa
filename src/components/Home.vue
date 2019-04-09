@@ -32,7 +32,7 @@
       <h3>対戦相手</h3>
       <select v-model="versus" class="custom-select my-1">
         <option v-for="(team, index) in teamList" v-bind:value="team" :key="index">
-            {{ team.name }}
+            {{ team['チーム名'] }}{{ team['uid'] }}
         </option>
       </select>
       <br>
@@ -99,6 +99,11 @@ export default {
         this.batters = Array.from(members);
         this.deffences = Array.from(members);
       })
+
+      const teamList = firebase.database().ref('/teams')
+      teamList.on('value', (snapshot) => {
+        this.teamList = Object.values(snapshot.val())
+      })
     }
   },
   data () {
@@ -114,26 +119,12 @@ export default {
         name: '',
         uniNum: '',
         versus: '',
-        teamList: [
-          {
-            name: '対戦相手なし',
-            uid: ''
-          },{
-            name: 'グローリアス',
-            uid: 'sB01dccqK5fSvXJy0wuvEXAaXwr1'
-          },{
-            name: 'dolphins',
-            uid: 'StZLsc4e6BccfgBM1pVlNqlgLDj2'
-          },{
-            name: '本牧野球大好きーズ',
-            uid: 'WSKf7MiSevOyeMp6y7iorZyt4pk2'
-          }
-        ]
+        teamList: []
       }
   },
   methods: {
     submit: function () {
-      let result = {
+      const result = {
           "選手名": this.name,
           "背番号": this.uniNum
 
@@ -165,9 +156,9 @@ export default {
         db.push(result)
       }
 
-      const versus = this.$store.getters.user.uid
+      const uid = this.$store.getters.user.uid
       const directory = '/order'
-      const db = firebase.database().ref(versus + directory)
+      const db = firebase.database().ref(uid + directory)
       db.set(this.deffences)
 
       this.$router.push({ name: 'OffenceAdd' })
