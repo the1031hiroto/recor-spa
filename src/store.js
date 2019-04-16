@@ -17,6 +17,11 @@ export default new Vuex.Store({
     },
     onUserStatusChanged(state, status) {
       state.status = status; //ログインしてるかどうか true or false
+    },
+    destroySession(state) {
+      for (let key in state) {
+        state[key] = {};
+      }
     }
   },
   getters: {

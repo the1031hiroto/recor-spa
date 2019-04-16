@@ -68,9 +68,10 @@ export default {
         firebase.auth().signOut().then(() => {
             this.$router.push('/signin')
         })
-        this.$store.commit('onAuthStateChanged', null);
-        this.$store.commit('onUserStatusChanged', false);
-        this.$store.commit('order', []);
+        this.$store.commit('destroySession', this.$store.state);
+        // this.$store.commit('onAuthStateChanged', null);
+        // this.$store.commit('onUserStatusChanged', false);
+        // this.$store.commit('state', []);
     },
     link: function (to, uid, team) {
       this.$store.uid = uid ? uid : this.user.uid

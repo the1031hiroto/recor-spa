@@ -21,6 +21,8 @@
                     </option>
                 </select>
 
+                <div id="target" @click="getClickPosition" :style="{ 'background-image': 'url(' + assetsImage + ')' }"><font-awesome-icon icon="map-pin" id="map-pin" /></div>
+
                 <select v-model="onBall" class="custom-select my-1">
                     <option v-for="(onBallOption, index) in onBallOptions" v-bind:value="onBallOption" :key="index">
                         {{ onBallOption.value }}
@@ -95,11 +97,11 @@
     </div>
 </template>
 
-
 <script>
 import firebase from 'firebase/app';
 import 'firebase/database';
 import moment from 'moment'
+import $ from 'jquery'
 
 export default {
     name: "offence-add",
@@ -108,17 +110,22 @@ export default {
         const directory = '/members'
         const membersList = firebase.database().ref(team + directory)
         membersList.on('value', (snapshot) => {
-            this.batters = Object.values(snapshot.val())
+            const members = Object.values(snapshot.val())
+            const order = this.$store.state.order
+            this.batters = order.length ? order : members
         })
-
-        this.batters = this.$store.state.order
 
         const versus = this.$store.state.versus.uid
-        const directoryOrder = '/order'
-        const orders = firebase.database().ref(versus + directoryOrder)
-        orders.on('value', (snapshot) => {
-            this.versusOrder = Object.values(snapshot.val())
-        })
+        if (versus) {
+            const directoryOrder = '/order'
+            const orders = firebase.database().ref(versus + directoryOrder)
+            orders.on('value', (snapshot) => {
+                this.versusOrder = Object.values(snapshot.val())
+            })
+        }
+
+        // document.getElementById( "target" ).addEventListener('click', this.getClickPosition, false);
+        // document.getElementById( "target" ).addEventListener('touchstart', this.getClickPosition, false);
     },
     data() {
         return {
@@ -149,18 +156,11 @@ export default {
                 { id: 0, value: 'ピッチャー' },
                 { id: 1, value: 'キャッチャー' },
                 { id: 2, value: '1塁' },
-                { value: '1塁線' },
-                { value: '2塁間' },
                 { id: 3, value: '2塁' },
-                { value: '2遊間' },
                 { id: 5, value: 'ショート' },
-                { value: '3遊間' },
                 { id: 4, value: '3塁' },
-                { value: '3塁線' },
                 { id: 8, value: 'ライト' },
-                { value: '右中間' },
                 { id: 7, value: 'センター' },
-                { value: 'ラ左中間イト' },
                 { id: 6, value: 'レフト' }
             ],
             recordOptions: [
@@ -185,6 +185,8 @@ export default {
             batter: "",
             hit: "",
             onBall: "",
+            onBallX: "",
+            onBallY: "",
             out: "",
             optionResult: [],
             daten: 0,
@@ -192,7 +194,8 @@ export default {
             isConfirmOther: false,
             showData: [0],
             other: "",
-            versusOrder: []
+            versusOrder: [],
+            assetsImage: "/ground.jpg"
         };
     },
     methods: {
@@ -213,7 +216,7 @@ export default {
             }
 
             if (!(this.hit == "四球" || this.hit == "死球" || this.out == "三振") && this.onBall) {
-                result["打球"] = this.onBall.value
+                result["打球"] = { x: this.onBallX, y: this.onBallY }
             }
 
             if (this.optionResult) {
@@ -228,7 +231,7 @@ export default {
             if (this.$store.state.versus.uid) {
                 this.updateVersusPitcher()
 
-                if (this.out || this.hit == "失策出" || this.hit == "ゲッツー崩れ") {
+                if (this.versusOrder.length || this.out || this.hit == "失策出" || this.hit == "ゲッツー崩れ") {
                     this.defineVersusDeffence()
                 }
             }
@@ -299,7 +302,11 @@ export default {
                 "選手名": name,
                 "捕殺": killSupportCount,
                 "刺殺": killCount,
-                "エラー": errorCount
+                "エラー": errorCount,
+                "打球": {
+                    x: this.onBallX,
+                    y: this.onBallY
+                }
             }
             this.updateVersusDB(a)
         },
@@ -342,8 +349,44 @@ export default {
             const directory = '/pitcher'
             const db = firebase.database().ref(versus + directory)
             db.push(result)
+        },
+        getClickPosition: function (e) {
+            // ページ内クリック位置
+            const clickX = e.pageX ;
+            const clickY = e.pageY ;
+            $('#map-pin').offset({ top: clickY, left: clickX });
+
+            // 要素の位置を取得
+            const clientRect = document.getElementById( "target" ).getBoundingClientRect() ;
+            const positionX = clientRect.left + window.pageXOffset ;
+            const positionY = clientRect.top + window.pageYOffset ;
+
+            // 要素内クリック位置
+            if (clickX) {
+                this.onBallX = clickX - positionX ;
+                this.onBallY = clickY - positionY ;
+            }
         }
     }
 };
 
 </script>
+
+<style>
+    #target {
+        position: relative;
+        width: 92vw;
+        height: 40vh;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: contain;
+        text-align: center;
+        color: red;
+    }
+    #map-pin {
+        position: absolute;
+        top: 73%;
+        left: 47%;
+        font-size: 2rem;
+    }
+</style>
