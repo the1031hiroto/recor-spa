@@ -10,6 +10,7 @@ import PitcherShow from '@/components/PitcherShow'
 import Signup from '@/components/Signup'
 import Signin from '@/components/Signin'
 import Home from '@/components/Home'
+import Members from '@/components/Members'
 
 Vue.use(Router)
 
@@ -54,7 +55,11 @@ let router =  new Router({
           path: '/pitcher-show/:team',
           name: 'PitcherShow',
           component: PitcherShow,
-      }
+      },{
+        path: '/members/:name',
+        name: 'Members',
+        component: Members,
+    }
     ]
 })
 

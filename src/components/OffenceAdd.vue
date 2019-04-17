@@ -351,10 +351,8 @@ export default {
             db.push(result)
         },
         getClickPosition: function (e) {
-            // ページ内クリック位置
-            const clickX = e.pageX ;
-            const clickY = e.pageY ;
-            $('#map-pin').offset({ top: clickY, left: clickX });
+            // ページ内クリック位置にピン表示
+            $('#map-pin').offset({ top: e.pageY, left: e.pageX });
 
             // 要素の位置を取得
             const clientRect = document.getElementById( "target" ).getBoundingClientRect() ;
@@ -362,9 +360,9 @@ export default {
             const positionY = clientRect.top + window.pageYOffset ;
 
             // 要素内クリック位置
-            if (clickX) {
-                this.onBallX = clickX - positionX ;
-                this.onBallY = clickY - positionY ;
+            if (e.clientX) {
+                this.onBallX = e.clientX - positionX ;
+                this.onBallY = e.clientY - positionY ;
             }
         }
     }
