@@ -1,36 +1,49 @@
 <template>
-    <div id="offence-show">
-        <h2>打撃成績</h2>
-        <div class="row justify-content-between px-3 mb-2">
-            <div class="col-xs-3">
+    <div id="offence-show" class="container-fluid">
+        <h2>{{ this.$route.params.team }} 打撃成績</h2>
+        <div class="row">
+            <div class="col-6 my-2">
                 <vuejs-datepicker
                     v-model="selectDate"
                     @input="changeTabu"
                     :format="customFormatter"
                     :highlighted="highlighted"
                     placeholder="日付で絞り込む"
-                    name="datepicker"
-                    class="col-xs" >
+                    name="datepicker" >
                 </vuejs-datepicker>
             </div>
-            <button
-                @click="changeTabu(new Date(new Date().getFullYear(), -12, 1), new Date(new Date().getFullYear(), 11, 31))"
-                :class="{'active': startAt === new Date(new Date().getFullYear(), 11, 31)}"
-                class="btn btn-outline-success btn-sm col-xs-3">トータル</button>
-            <button
-                @click="changeTabu(new Date(new Date().getFullYear(), 0, 1), new Date(new Date().getFullYear(), 11, 31))"
-                :class="{'active': startAt === new Date(new Date().getFullYear(), 0, 1)}"
-                class="btn btn-outline-success btn-sm col-xs-3">今シーズン</button>
-            <button
-                @click="regulation()"
-                :class="{'active': isRegulation === true}"
-                class="btn btn-outline-success btn-sm col-xs-3">規定({{ regulationNum }}打席)以上</button>
-            <button
-                @click="recent20"
-                :class="{'active': isRecent20 === true}"
-                class="btn btn-outline-success btn-sm col-xs-3">直近20打席</button>
+            <div class="col-6 my-2">
+                <button
+                    @click="regulation()"
+                    :class="{'active': isRegulation === true}"
+                    class="btn btn-outline-success btn-sm">規定({{ regulationNum }}打席)以上</button>
+            </div>
+            <div class="col-4 mb-3">
+                <button
+                    @click="changeTabu(new Date(new Date().getFullYear(), -12, 1), new Date(new Date().getFullYear(), 11, 31))"
+                    :class="{'active': startAt === new Date(new Date().getFullYear(), 11, 31)}"
+                    class="btn btn-outline-success btn-sm">トータル</button>
+            </div>
+            <div class="col-4 mb-3">
+                <button
+                    @click="changeTabu(new Date(new Date().getFullYear(), 0, 1), new Date(new Date().getFullYear(), 11, 31))"
+                    :class="{'active': startAt === new Date(new Date().getFullYear(), 0, 1)}"
+                    class="btn btn-outline-success btn-sm">今シーズン</button>
+            </div>
+            <div class="col-4 mb-3">
+                <button
+                    @click="recent20"
+                    :class="{'active': isRecent20 === true}"
+                    class="btn btn-outline-success btn-sm">直近20打席</button>
+            </div>
         </div>
-        <b-table :items="showData" :fields="columns" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" striped hover responsive small />
+        <b-table
+            :items="showData"
+            :fields="columns"
+            :sort-by.sync="sortBy"
+            :sort-desc.sync="sortDesc"
+            @row-clicked="linkMemebers"
+            striped hover responsive small />
 
         <br>
         <ul class="list-group">
@@ -289,8 +302,10 @@ export default {
             this.getData(20)
         },
         getData: function(filterNum){
-            const directory = '/records'
-            const allRawData = firebase.database().ref(directory);
+            // TODO: ログイン状態をみる
+            const team = this.$store.uid
+            const directory = '/offence'
+            const allRawData = firebase.database().ref(team + directory)
             let offenceDataList = []
             allRawData.orderByChild("試合日").startAt(moment(this.startAt).format('YYYY/MM/DD')).endAt(moment(this.endAt).format('YYYY/MM/DD')).on('value', (snapshot) => {
                 const offenceData = snapshot.val()
@@ -306,7 +321,7 @@ export default {
                         dataColumns.map(item => { element[item] += current[item] && element['打席数'] < filterNum ? current[item] : 0 });
                     } else {
                         let data = { '選手名' : current['選手名'] }
-                        dataColumns.forEach(item => { data[item] = current[item] });
+                        dataColumns.forEach(item => { data[item] = current[item] ? current[item] : 0 });
                         result.push(data)
                     }
                     return result
@@ -323,7 +338,7 @@ export default {
                 const shishi = mainData[i]["四球"] + mainData[i]["死球"]
                 mainData[i]["安打"] = mainData[i]["1塁打"] + mainData[i]["2塁打"] + mainData[i]["3塁打"] + mainData[i]["本塁打"]
                 mainData[i]["塁打数"] = mainData[i]["1塁打"] + mainData[i]["2塁打"] * 2 + mainData[i]["3塁打"] * 3 + mainData[i]["本塁打"]* 4
-                mainData[i]["打率"] = Math.floor(mainData[i]["安打"] / dasu * 100) / 100
+                mainData[i]["打率"] = Math.floor(mainData[i]["安打"] / dasu * 1000) / 1000
                 mainData[i]["三割(4打数)"] = this.calculate_tree_ratio(mainData[i]["安打"], dasu)
                 const x = (mainData[i]["安打"] + shishi) / (dasu + shishi + mainData[i]["犠飛"] + mainData[i]["犠打"])
                 mainData[i]["出塁率"] = Math.floor(x * 100) / 100
@@ -385,7 +400,6 @@ export default {
                     (dasu - mainData[i]["安打"] + caughtStealing + mainData[i]["併殺打"])
                 ).toFixed(3)
                 mainData[i]["PS"] = ((mainData[i]["本塁打"] * mainData[i]["盗塁"] * 2) / (mainData[i]["本塁打"] + mainData[i]["盗塁"])).toFixed(3)
-                // PS＝(本塁打×盗塁×２)／(本塁打＋盗塁) 
 
             }
             this.calculation_WOBA_avr(mainData)
@@ -512,7 +526,14 @@ export default {
             }
             this.regulationNum = maxData['試合'] * 2
             return maxData
-        }
+        },
+        linkMemebers(record) {
+            this.$router.replace({ name: 'Members', params: { name: record['選手名'] }})
+        },
+    },
+    beforeRouteUpdate (to, from , next) {
+        this.getData()
+        next()
     }
 };
 </script>
@@ -551,4 +572,5 @@ td:first-child {
 #offence-show .list-group {
     font-size: .5rem;
 }
+
 </style>
