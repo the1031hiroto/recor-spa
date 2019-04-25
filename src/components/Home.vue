@@ -1,47 +1,105 @@
 <template>
-  <div id="home" v-if="isSignedIn">
+  <div id="home" class="container-fluid" v-if="isSignedIn">
     <h2>チーム名： {{ user.displayName }}</h2>
-    <form @submit.prevent="isConfirm = true">
-      <input type="text" class="form-control" placeholder="選手名" v-model="name" required>
-      <input type="number" class="form-control" placeholder="背番号" v-model="uniNum" required>
-      <button type="submit" class="btn btn-outline-primary my-1">選手追加</button>
-    </form>
-    <button v-if="!isGameOn" @click="isGameOn = true" class="btn btn-outline-primary my-1">試合開始</button>
-
-    <div v-if="isGameOn" class="border-bottom my-2 py-2">
-      <h3>オーダー</h3>
-      <draggable :list="batters" class="dragArea" element="ul">
-          <li v-for="(batter, index) in batters" :key="index">{{ batter['選手名'] }}</li>
-      </draggable>
-      <button @click="reduceBatter" type="button" class="btn btn-outline-warning">最後のバッターを除外</button>
-      <br>
-      <button @click="isConfirmOrder = true" type="button" class="btn btn-outline-success my-1">オーダー確定</button>
+    <div class="row border-bottom py-2 justify-content-end">
+      <div class="col-4">
+        <button v-if="!isGameOn" @click="isGameOn = true" class="btn btn-outline-primary my-1">試合開始</button>
+      </div>
     </div>
 
-    <div v-if="isConfirmOrder" class="border-bottom my-2 py-2">
-      <h3>守備位置</h3>
-      <draggable :list="deffences" class="dragArea" element="ul">
-          <li v-for="(deffence, index) in deffences" :key="index">{{ deffence['選手名'] }}</li>
-      </draggable>
-      <button @click="reduceDeffence" type="button" class="btn btn-outline-warning">最後の守備を除外</button>
-      <br>
-      <button @click="isConfirmDeffence = true" type="button" class="btn btn-outline-success my-1">守備位置確定</button>
+    <div v-if="isGameOn" class="row border-bottom my-2 py-2">
+      <div class="col-12">
+        <div class="row justify-content-end">
+          <div class="col-auto">
+            <h3>オーダー</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="row justify-content-end">
+          <div class="col-7">
+            <draggable :list="batters" class="dragArea" element="ul">
+                <li v-for="(batter, index) in batters" :key="index">{{ batter['選手名'] }}</li>
+            </draggable>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="row my-1 justify-content-end">
+          <div class="col-auto">
+            <button @click="reduceBatter" type="button" class="btn btn-outline-warning">最後のバッターを除外</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="row my-1 justify-content-end">
+          <div class="col-auto">
+            <button @click="isConfirmOrder = true; isGameOn = false" type="button" class="btn btn-outline-success">オーダー確定</button>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div v-if="isConfirmDeffence" class="border-bottom my-2 py-2">
-      <h3>対戦相手</h3>
-      <select v-model="versus" class="custom-select my-1">
-        <option v-for="(team, index) in teamList" v-bind:value="team" :key="index">
-            {{ team['チーム名'] }}{{ team['uid'] }}
-        </option>
-      </select>
-      <br>
-      <button @click="isConfirmGame = true" type="button" class="btn btn-outline-success my-1">対戦相手確定</button>
+    <div v-if="isConfirmOrder" class="row border-bottom my-2 py-2">
+      <div class="col-12">
+        <div class="row justify-content-end">
+          <div class="col-auto">
+            <h3>守備位置</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="row justify-content-end">
+          <div class="col-7">
+            <draggable :list="deffences" class="dragArea" element="ul">
+              <li v-for="(deffence, index) in deffences" :key="index">{{ deffence['選手名'] }}</li>
+          </draggable>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="row my-1 justify-content-end">
+          <div class="col-auto">
+            <button @click="reduceDeffence" type="button" class="btn btn-outline-warning">最後の守備を除外</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
+        <div class="row my-1 justify-content-end">
+          <div class="col-auto">
+            <button @click="isConfirmDeffence = true; isConfirmOrder = false" type="button" class="btn btn-outline-success my-1">守備位置確定</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="isConfirmDeffence" class="row border-bottom my-2 py-2">
+      <div class="col-12">
+        <div class="row justify-content-end">
+          <div class="col-auto">
+            <h3>対戦相手</h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 my-1">
+        <select v-model="versus" class="custom-select">
+          <option v-for="(team, index) in teamList" v-bind:value="team" :key="index">
+              {{ team['チーム名'] }}
+          </option>
+        </select>
+      </div>
+      <div class="col-12">
+        <div class="row my-1 justify-content-end">
+          <div class="col-auto">
+            <button @click="isConfirmGame = true" type="button" class="btn btn-outline-success my-1">対戦相手確定</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div v-if="isConfirmGame" class="modal1">
       <div>
-        <p class="list-group-item">対戦相手{{ versus.name }}</p>
+        <p class="list-group-item">対戦相手{{ versus }}</p>
         <P>オーダー</P>
         <ul class="list-group mb-4">
             <li v-for="(batter, index) in batters" :key="index">{{ batter['選手名'] }}</li>
@@ -51,7 +109,7 @@
             <li v-for="(deffence, index) in deffences" :key="index">{{ deffence['選手名'] }}</li>
         </ul>
         <button class="btn btn-primary mx-1" @click="submitGame">確定</button>
-        <button @click="isConfirmGame = false" type="button" class="btn btn-outline-warning mx-1">閉じる</button>
+        <button @click="isConfirmGame = false; isGameOn = true" type="button" class="btn btn-outline-warning mx-1">キャンセル</button>
       </div>
     </div>
 
@@ -65,6 +123,18 @@
         <button @click="isConfirm = false" type="button" class="btn btn-outline-warning mx-1">閉じる</button>
       </div>
     </div>
+
+    <form @submit.prevent="isConfirm = true"  class="row border-bottom my-2 py-2 justify-content-end">
+      <div class="col-4">
+        <input type="text" class="form-control" placeholder="選手名" v-model="name" required>
+      </div>
+      <div class="col-4">
+        <input type="number" class="form-control" placeholder="背番号" v-model="uniNum" required>
+      </div>
+      <div class="col-4">
+        <button type="submit" class="btn btn-outline-primary">選手追加</button>
+      </div>
+    </form>
   </div>
 </template>
 
@@ -173,9 +243,6 @@ export default {
 }
 </script>
 <style>
-.dragArea {
-    width: 10rem;
-}
 .dragArea li,
 .modal1 li {
     list-style-type: decimal;

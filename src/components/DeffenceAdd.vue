@@ -1,5 +1,5 @@
 <template>
-    <div id="deffence-add">
+    <div id="deffence-add" class="container-fluid">
         <h2>守備追加</h2>
         <deffence-add-component
             v-for="deffence in deffences"
@@ -25,7 +25,6 @@ export default {
     data() {
         return {
             deffences: [],
-            position: 0,
         };
     },
     methods: {

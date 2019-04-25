@@ -1,36 +1,49 @@
 <template>
-    <div id="offence-show">
+    <div id="offence-show" class="container-fluid">
         <h2>{{ this.$route.params.team }} 打撃成績</h2>
-        <div class="row justify-content-between px-3 mb-2">
-            <div class="col-xs-3">
+        <div class="row">
+            <div class="col-6 my-2">
                 <vuejs-datepicker
                     v-model="selectDate"
                     @input="changeTabu"
                     :format="customFormatter"
                     :highlighted="highlighted"
                     placeholder="日付で絞り込む"
-                    name="datepicker"
-                    class="col-xs" >
+                    name="datepicker" >
                 </vuejs-datepicker>
             </div>
-            <button
-                @click="changeTabu(new Date(new Date().getFullYear(), -12, 1), new Date(new Date().getFullYear(), 11, 31))"
-                :class="{'active': startAt === new Date(new Date().getFullYear(), 11, 31)}"
-                class="btn btn-outline-success btn-sm col-xs-3">トータル</button>
-            <button
-                @click="changeTabu(new Date(new Date().getFullYear(), 0, 1), new Date(new Date().getFullYear(), 11, 31))"
-                :class="{'active': startAt === new Date(new Date().getFullYear(), 0, 1)}"
-                class="btn btn-outline-success btn-sm col-xs-3">今シーズン</button>
-            <button
-                @click="regulation()"
-                :class="{'active': isRegulation === true}"
-                class="btn btn-outline-success btn-sm col-xs-3">規定({{ regulationNum }}打席)以上</button>
-            <button
-                @click="recent20"
-                :class="{'active': isRecent20 === true}"
-                class="btn btn-outline-success btn-sm col-xs-3">直近20打席</button>
+            <div class="col-6 my-2">
+                <button
+                    @click="regulation()"
+                    :class="{'active': isRegulation === true}"
+                    class="btn btn-outline-success btn-sm">規定({{ regulationNum }}打席)以上</button>
+            </div>
+            <div class="col-4 mb-3">
+                <button
+                    @click="changeTabu(new Date(new Date().getFullYear(), -12, 1), new Date(new Date().getFullYear(), 11, 31))"
+                    :class="{'active': startAt === new Date(new Date().getFullYear(), 11, 31)}"
+                    class="btn btn-outline-success btn-sm">トータル</button>
+            </div>
+            <div class="col-4 mb-3">
+                <button
+                    @click="changeTabu(new Date(new Date().getFullYear(), 0, 1), new Date(new Date().getFullYear(), 11, 31))"
+                    :class="{'active': startAt === new Date(new Date().getFullYear(), 0, 1)}"
+                    class="btn btn-outline-success btn-sm">今シーズン</button>
+            </div>
+            <div class="col-4 mb-3">
+                <button
+                    @click="recent20"
+                    :class="{'active': isRecent20 === true}"
+                    class="btn btn-outline-success btn-sm">直近20打席</button>
+            </div>
         </div>
-        <b-table :items="showData" :fields="columns" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc" striped hover responsive small />
+        <b-table
+            :items="showData"
+            :fields="columns"
+            :sort-by.sync="sortBy"
+            :sort-desc.sync="sortDesc"
+            @row-clicked="linkMemebers"
+            striped hover responsive small />
 
         <br>
         <ul class="list-group">
@@ -513,7 +526,10 @@ export default {
             }
             this.regulationNum = maxData['試合'] * 2
             return maxData
-        }
+        },
+        linkMemebers(record) {
+            this.$router.replace({ name: 'Members', params: { name: record['選手名'] }})
+        },
     },
     beforeRouteUpdate (to, from , next) {
         this.getData()
@@ -556,4 +572,5 @@ td:first-child {
 #offence-show .list-group {
     font-size: .5rem;
 }
+
 </style>

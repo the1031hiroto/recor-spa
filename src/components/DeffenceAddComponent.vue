@@ -1,16 +1,32 @@
 <template>
-    <div id="deffence-add-component" class="d-flex justify-content-between flex-wrap border-bottom my-2 py-2">
-        <h5 class="mt-2">{{ deffence.name }}</h5>
-        <select v-model="position" class="custom-select mb-2">
-            <option v-for="(positionOption, index) in this.positionOptions" :value="positionOption.value" :key="index">
-                {{ positionOption.text }}
-            </option>
-        </select>
-        <button v-on:click="deffence.killSupportCount++" type="button" class="btn btn-outline-secondary btn-sm my-1">捕殺 {{ deffence.killSupportCount }} 回</button>
-        <button v-on:click="deffence.killCount++" type="button" class="btn btn-outline-secondary btn-sm my-1">刺殺 {{ deffence.killCount }} 回</button>
-        <button v-on:click="deffence.errorCount++" type="button" class="btn btn-outline-secondary btn-sm my-1">エラー {{ deffence.errorCount }} 回</button>
-        <button @click="subumitDeffence" type="button" class="btn btn-outline-primary btn-sm my-1">submit</button>
-    </div>
+    <!-- <div id="deffence-add-component" class="row border-bottom my-2 py-2"> -->
+    <form id="deffence-add-component" @submit.prevent="subumitDeffence" class="row border-bottom my-2 py-2">
+        <div class="col-5">
+            <h5 class="mt-2">{{ deffence.name }}</h5>
+        </div>
+        <div class="col-7 form-group">
+            <select v-model="position" class="custom-select">
+                <option v-for="(positionOption, index) in positionOptions" :value="positionOption.value" :key="index">
+                    {{ positionOption.text }}
+                </option>
+            </select>
+        </div>
+        <div class="col-4 my-1">
+            <button v-on:click="deffence.killSupportCount++" type="button" class="btn btn-outline-secondary btn-sm">捕殺:{{ deffence.killSupportCount }}回</button>
+        </div>
+        <div class="col-4 my-1">
+            <button v-on:click="deffence.killCount++" type="button" class="btn btn-outline-secondary btn-sm">刺殺:{{ deffence.killCount }}回</button>
+        </div>
+        <div class="col-4 my-1">
+            <button v-on:click="deffence.errorCount++" type="button" class="btn btn-outline-secondary btn-sm">エラー:{{ deffence.errorCount }}回</button>
+        </div>
+        <div class="col-12 my-1 float-right">
+                <div class="float-right">
+                <button type="submit" class="btn btn-outline-primary">追加</button>
+            </div>
+        </div>
+    </form>
+    <!-- </div> -->
 </template>
 
 <script>
@@ -20,8 +36,10 @@ import moment from 'moment'
 
 export default {
     name: "deffence-add-component",
+    props: ['deffence'],
     data() {
         return {
+            position: '',
             positionOptions: [
                 { text: 'ポジション', value: '' },
                 { text: 'ピッチャー', value: 'ピッチャー' },
@@ -36,7 +54,6 @@ export default {
             ]
         };
     },
-    props: ['deffence', 'position'],
     methods: {
         subumitDeffence: function () {
             let result = {
@@ -61,8 +78,3 @@ export default {
     },
 };
 </script>
-<style>
-#deffence-add select {
-    width: 16rem;
-}
-</style>

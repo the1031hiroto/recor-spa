@@ -1,69 +1,86 @@
 <template>
-    <div id="offence-add">
+    <div id="offence-add" class="container-fluid">
         <h2>打撃追加</h2>
-        <div class="border-bottom my-2 py-2">
-            <h3>打撃成績</h3>
-            <form @submit.prevent="validate">
-                <select v-model="batter" class="custom-select my-1" required>
+        <form @submit.prevent="validate" class="row border-bottom my-2 py-2">
+            <div class="col-12 my-1">
+                <label>打撃成績</label>
+                <select v-model="batter" class="custom-select" required>
+                    <option value=''>バッター</option>
                     <option v-for="(batter, index) in batters" v-bind:value="batter['選手名']" :key="index">
                         {{ batter['選手名'] }}
                     </option>
                 </select>
-                <select v-model="hit" class="custom-select my-1">
+            </div>
+            <div class="col-12 my-1">
+                <select v-model="hit" class="custom-select">
                     <option v-for="(hitOption, index) in hitOptions" v-bind:value="hitOption.value" :key="index">
                         {{ hitOption.text }}
                     </option>
                 </select>
-
-                <select v-model="out" class="custom-select my-1">
+            </div>
+            <div class="col-12 my-1">
+                <select v-model="out" class="custom-select">
                     <option v-for="(outOption, index) in outOptions" v-bind:value="outOption.value" :key="index">
                         {{ outOption.text }}
                     </option>
                 </select>
+            </div>
 
-                <div id="target" @click="getClickPosition" :style="{ 'background-image': 'url(' + assetsImage + ')' }"><font-awesome-icon icon="map-pin" id="map-pin" /></div>
+            <div id="target" class="col-12" @click="getClickPosition" :style="{ 'background-image': 'url(' + assetsImage + ')' }"><font-awesome-icon icon="map-pin" id="map-pin" /></div>
 
-                <select v-model="onBall" class="custom-select my-1">
+            <div class="col-12 my-1">
+                <select v-model="onBall" class="custom-select">
+                    <option value=''>捕球者</option>
                     <option v-for="(onBallOption, index) in onBallOptions" v-bind:value="onBallOption" :key="index">
                         {{ onBallOption.value }}
                     </option>
                 </select>
-
-                <select v-model="daten" class="custom-select my-1">
+            </div>
+            <div class="col-12 my-1">
+                <select v-model="daten" class="custom-select">
+                    <option value=''>打点</option>
                     <option v-for="(datenOption, index) in datenOptions" v-bind:value="datenOption.value" :key="index">
                         {{ datenOption.text }}
                     </option>
                 </select>
+            </div>
 
-                <div id='option' class="custom-checkbox my-1">
-                    オプション：
-                    <label v-for="(option, index) in recordOptions" :for="option.value" :key="index">
-                        <input :id="option.value" :value="option.value" v-model="optionResult" type="checkbox"/>
-                        {{ option.text }}
-                    </label>
+            <div id='option' class="col-12">
+                <div v-for="(option, index) in recordOptions" :key="index" class="form-check form-check-inline">
+                    <input v-model="optionResult" :id="option.value" :value="option.value" class="form-check-input" type="checkbox"/>
+                    <label :for="option.value" class="form-check-label">{{ option.text }}</label>
                 </div>
-
-                <button type="submit" class="btn btn-outline-primary my-1">追加</button>
-            </form>
-        </div>
-        <div class="border-bottom my-2 py-2">
-            <h3>その他</h3>
-            <form @submit.prevent="isConfirmOther = true">
-                <select v-model="batter" class="custom-select my-1" required>
+            </div>
+            <div class="col-12">
+                <div class="float-right">
+                    <button type="submit" class="btn btn-outline-primary my-1">追加</button>
+                </div>
+            </div>
+        </form>
+        
+        <form @submit.prevent="isConfirmOther = true" class="row border-bottom my-2 py-2">
+            <div class="col-12 my-1 form-group">
+                <label>その他</label>
+                <select v-model="batter" class="custom-select" required>
                     <option v-for="(batter, index) in batters" v-bind:value="batter['選手名']" :key="index">
                         {{ batter['選手名'] }}
                     </option>
                 </select>
-
-                <select v-model="other" class="custom-select my-1" required>
+            </div>
+            <div class="col-12 my-1 form-group">
+                <select v-model="other" class="custom-select" required>
                     <option v-for="(otherOption, index) in otherOptions" v-bind:value="otherOption.value" :key="index">
                         {{ otherOption.text }}
                     </option>
                 </select>
-
-                <button type="submit" class="btn btn-outline-primary my-1">追加</button>
-            </form>
-        </div>
+            </div>
+            <div class="col-12">
+                <div class="float-right">
+                    <button type="submit" class="btn btn-outline-primary my-1">追加</button>
+                </div>
+            </div>
+        </form>
+        
         <div v-if="isConfirm" class="modal1">
             <div>
                 <ul class="list-group mb-4">
@@ -152,7 +169,6 @@ export default {
                 { text: '併殺打', value: '併殺打' }
             ],
             onBallOptions: [
-                { text: '打球', value: '' },
                 { id: 0, value: 'ピッチャー' },
                 { id: 1, value: 'キャッチャー' },
                 { id: 2, value: '1塁' },
@@ -170,7 +186,6 @@ export default {
                 { text: '公式戦', value: '公式戦' },
             ],
             datenOptions: [
-                { text: '打点', value: '' },
                 { text: '1打点', value: 1 },
                 { text: '2打点', value: 2 },
                 { text: '3打点', value: 3 },
