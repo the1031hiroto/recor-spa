@@ -2,66 +2,46 @@
   <div id="app">
     <router-view/>
     <div id="app" class="container-fluid">
-      <div class="row justify-content-end" v-if="isSignedIn">
+      <div class="row justify-content-end">
           <p class="col-3">Menu</p>
       </div>
-      <div class="row" v-if="isSignedIn">
-        <div class="col-12">
-          <div class="row justify-content-end">
-            <div class="col-auto">
-              <router-link tag="button" to="/offence-add" class="btn btn-outline-success btn-sm">打撃追加</router-link>
-            </div>
-            <div class="col-auto">
-              <router-link tag="button" to="/deffence-add" class="btn btn-outline-success btn-sm">守備追加</router-link>
-            </div>
-          </div>
-        </div>
+      <div v-if="this.$route.params.team" class="row">
         <div class="col-12">
           <div class="row justify-content-end">
             <div class="col-auto my-2">
-              <button @click="link('OffenceShow')" class="btn btn-outline-info btn-sm">打撃成績</button>
+              <button @click="linkPush('OffenceShow')" class="btn btn-outline-info btn-sm">打撃成績</button>
             </div>
             <div class="col-auto my-2">
-              <button @click="link('DeffenceShow')" class="btn btn-outline-info btn-sm">守備成績</button>
+              <button @click="linkPush('DeffenceShow')" class="btn btn-outline-info btn-sm">守備成績</button>
             </div>
             <div class="col-auto my-2">
-              <button @click="link('PitcherShow')" class="btn btn-outline-info btn-sm">投手成績</button>
+              <button @click="linkPush('PitcherShow')" class="btn btn-outline-info btn-sm">投手成績</button>
             </div>
           </div>
         </div>
       </div>
-      <div class="row my-3 justify-content-end">
+      <div v-if="isSignedIn" class="row my-3 justify-content-end">
         <div class="col-auto">
-          <button @click="signOut" v-if="isSignedIn" class="btn btn-outline-warning">ログアウト</button>
+          <button @click="signOut" class="btn btn-outline-warning">ログアウト</button>
         </div>
         <div class="col-auto">
-          <router-link tag="button" to="/" class="btn btn-outline-success">HOME</router-link>
+          <button @click="linkHome('Home')" class="btn btn-outline-success">HOME</button>
         </div>
       </div>
-      <h3>成績一覧</h3>
-      <h4>打撃成績</h4>
-      <button v-for="(team, index) in teamList" :key="`first-${index}`"
-        @click="link('OffenceShow', team['uid'], team['チーム名'])"
-        class="btn btn-outline-success mx-1 btn-sm">
-        {{ team['チーム名'] }}
-      </button>
-      <br>
-      <h4>守備成績</h4>
-      <button v-for="(team, index) in teamList" :key="`second-${index}`"
-        @click="link('DeffenceShow', team['uid'], team['チーム名'])"
-        class="btn btn-outline-success mx-1 btn-sm">
-        {{ team['チーム名'] }}
-      </button>
-      <br>
-      <h4>投手成績</h4>
-      <button v-for="(team, index) in teamList" :key="`third-${index}`"
-        @click="link('PitcherShow', team['uid'], team['チーム名'])"
-        class="btn btn-outline-success mx-1 btn-sm">
-        {{ team['チーム名'] }}
-      </button>
-      <br>
+      <div class="row my-3">
+        <div class="col-12">
+          <h3>チーム一覧</h3>
+        </div>
+        <div v-for="(team, index) in teamList" :key="index" @click="link('Home', team['チーム名'])" class="col-auto my-1">
+          <button
+            class="btn btn-outline-success mx-1 btn-sm">
+            {{ team['チーム名'] }}
+          </button>
+        </div>
+      </div>
       <div v-if="!isSignedIn">
-        成績追加する為にはログインが必要です。<router-link tag="button" to="/signin">ログイン</router-link>
+        <h4 class="font-weight-bold">成績追加する為にはログインが必要です。</h4>
+        <router-link tag="button" to="/signin" class="btn btn-outline-info font-weight-bold">ログイン</router-link>
       </div>
     </div>
   </div>
@@ -85,27 +65,48 @@ export default {
       }
   },
   computed: {
-    user() {
+    user: function() {
         return this.$store.getters.user;
     },
-    isSignedIn() {
+    isSignedIn: function() {
       return this.$store.getters.isSignedIn;
-    }
+    },
   },
   methods: {
     signOut: function () {
-        firebase.auth().signOut().then(() => {
-            this.$router.push('/signin')
-        })
-        this.$store.commit('destroySession', this.$store.state);
-        // this.$store.commit('onAuthStateChanged', null);
-        // this.$store.commit('onUserStatusChanged', false);
-        // this.$store.commit('state', []);
+      firebase.auth().signOut().then(() => {
+          this.$router.replace('/signin')
+      })
+      this.$store.commit('destroySession', this.$store.state);
+      // this.$store.commit('onAuthStateChanged', null);
+      // this.$store.commit('onUserStatusChanged', false);
+      // this.$store.commit('state', []);
     },
-    link: function (to, uid, team) {
-      this.$store.uid = uid ? uid : this.user.uid
-      const teamName = team ? team : this.user.displayName
-      this.$router.replace({ name: to, params: { team: teamName }})
+    linkHome: function (to) {
+      this.$router.replace({ name: to, params: { team: this.user.displayName }})
+    },
+    linkPush: function (to) {
+      this.getTeams()
+      this.$router.push({ name: to })
+    },
+    link: function (to, team) {
+      this.getTeams()
+      this.$router.replace({ name: to, params: { team: team }})
+    },
+    getTeams: function(){
+      const directory = '/teams'
+      const allRawData = firebase.database().ref(directory)
+      let teamList = []
+      allRawData.on('value', (snapshot) => {
+          const teamData = snapshot.val()
+          Object.keys(teamData).forEach(function (k, i) {
+              teamList[i] = teamData[k]
+          })
+          const teamName = this.$route.params.team
+          const team = teamList.filter(item => item['チーム名'] == teamName)
+          store.commit('onUcurrentTeamChanged', team[0]);
+          // this.$store.currentTeam = team[0]
+      })
     }
   }
 };

@@ -28,9 +28,14 @@ export default {
             deffenceData: [],
         };
     },
+    computed: {
+        currentTeam: function() {
+            return this.$store.getters.currentTeam;
+        }
+    },
     methods: {
         getData: function(){
-            const team = this.$store.uid
+            const team = this.currentTeam['uid']
             const directory = '/deffence'
             const allRawDeffenceData = firebase.database().ref(team + directory)
             let deffenceDataList = []

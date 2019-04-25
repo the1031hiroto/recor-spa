@@ -1,9 +1,9 @@
 <template>
   <div id="home" class="container-fluid" v-if="isSignedIn">
-    <h2>チーム名： {{ user.displayName }}</h2>
-    <div class="row border-bottom py-2 justify-content-end">
+    <h2>チーム名： {{ this.$route.params.team }}</h2>
+    <div v-if="isMyPage" class="row border-bottom py-2 justify-content-end">
       <div class="col-4">
-        <button v-if="!isGameOn" @click="isGameOn = true" class="btn btn-outline-primary my-1">試合開始</button>
+        <button v-if="!isGameOn" @click="gameOn" class="btn btn-outline-primary my-1">試合開始</button>
       </div>
     </div>
 
@@ -124,7 +124,7 @@
       </div>
     </div>
 
-    <form @submit.prevent="isConfirm = true"  class="row border-bottom my-2 py-2 justify-content-end">
+    <form v-if="isMyPage" @submit.prevent="isConfirm = true" class="row border-bottom my-2 py-2 justify-content-end">
       <div class="col-4">
         <input type="text" class="form-control" placeholder="選手名" v-model="name" required>
       </div>
@@ -135,6 +135,28 @@
         <button type="submit" class="btn btn-outline-primary">選手追加</button>
       </div>
     </form>
+
+    <form v-if="isMyPage" @submit.prevent="chengeName()" class="row border-bottom my-2 py-2 justify-content-end">
+      <div class="col-4">
+        <input type="text" class="form-control" placeholder="チーム名" v-model="teamName" required>
+      </div>
+      <div class="col-5">
+        <button type="submit" class="btn btn-outline-primary">チーム名変更</button>
+      </div>
+    </form>
+
+    <div class="row" v-if="isMyPage">
+      <div class="col-12">
+        <div class="row justify-content-end">
+          <div class="col-auto">
+            <router-link tag="button" to="/offence-add" class="btn btn-outline-success btn-sm">打撃追加</router-link>
+          </div>
+          <div class="col-auto">
+            <router-link tag="button" to="/deffence-add" class="btn btn-outline-success btn-sm">守備追加</router-link>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -154,13 +176,36 @@ export default {
       return this.$store.getters.isSignedIn;
     },
     user() {
-        const displayName = this.$store.getters.user ? this.$store.getters.user : 'No Name'
-        return displayName;
+      const displayName = this.$store.getters.user ? this.$store.getters.user : 'No Name'
+      return displayName;
     },
-
+    currentTeam: function() {
+      return this.$store.getters.currentTeam;
+    }
   },
-  mounted() {
-    if (this.isSignedIn) {
+  // mounted() {
+  //   this.isMyPage = this.$route.params.team == this.$store.getters.user.displayName ? true : false
+  // },
+  data () {
+      return {
+        isMyPage: false,
+        isConfirm: false,
+        isConfirmGame: false,
+        isConfirmDeffence: false,
+        isGameOn: false,
+        isConfirmOrder: false,
+        isConfirmVersus: false,
+        batters: [],
+        deffences: [],
+        name: '',
+        uniNum: '',
+        versus: '',
+        teamList: [],
+        teamName: ''
+      }
+  },
+  methods: {
+    gameOn: function () {
       const team = this.$store.getters.user.uid
       const directory = '/members'
       const membersList = firebase.database().ref(team + directory)
@@ -174,25 +219,9 @@ export default {
       teamList.on('value', (snapshot) => {
         this.teamList = Object.values(snapshot.val())
       })
-    }
-  },
-  data () {
-      return {
-        isConfirm: false,
-        isConfirmGame: false,
-        isConfirmDeffence: false,
-        isGameOn: false,
-        isConfirmOrder: false,
-        isConfirmVersus: false,
-        batters: [],
-        deffences: [],
-        name: '',
-        uniNum: '',
-        versus: '',
-        teamList: []
-      }
-  },
-  methods: {
+
+      this.isGameOn = true
+    },
     submit: function () {
       const result = {
           "選手名": this.name,
@@ -239,7 +268,36 @@ export default {
     reduceDeffence: function () {
       this.deffences.pop()
     },
+    chengeName: function () {
+      const user = firebase.auth().currentUser
+      user.updateProfile({
+          displayName: this.teamName,
+      }).then(function() {
+        const uid = user.uid
+        const directory = '/teams'
+        const allRawData = firebase.database().ref(directory)
+        allRawData.on('value', function(snapshot) {
+          const teamData = snapshot.val()
+          var teamUid = Object.keys(teamData).filter(function(team) {
+            return teamData[team]['uid'] == uid
+          })
+          const db = firebase.database().ref(directory + '/' + teamUid[0] + '/チーム名')
+          db.set(user.displayName)
+          // TODO currentTeamに入れる（thisがnull問題）
+          // this.$store.currentTeam = teamData[a[0]]
+        })
+        // TODO ちゃんとメッセージだす
+        alert('done')
+      }).catch(function(error) {
+        alert(error.message)
+      });
+    }
   },
+  // watch: {
+  //   '$route': function () {
+  //     this.isMyPage = this.$route.params.team == this.$store.getters.user.displayName ? true : false
+  //   }
+  // }
 }
 </script>
 <style>

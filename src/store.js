@@ -9,7 +9,8 @@ export default new Vuex.Store({
     user: {},
     status: false,
     order: {},
-    versus: {}
+    versus: {},
+    currentTeam: ''
   },
   mutations: {
     onAuthStateChanged(state, user) {
@@ -18,9 +19,12 @@ export default new Vuex.Store({
     onUserStatusChanged(state, status) {
       state.status = status; //ログインしてるかどうか true or false
     },
+    onUcurrentTeamChanged(state, currentTeam) {
+      state.currentTeam = currentTeam;
+    },
     destroySession(state) {
       for (let key in state) {
-        state[key] = {};
+        state[key] = null;
       }
     }
   },
@@ -33,6 +37,9 @@ export default new Vuex.Store({
     },
     order(state) {
       return state.order;
+    },
+    currentTeam(state) {
+      return state.currentTeam;
     }
   },
   plugins: [createPersistedState()]
