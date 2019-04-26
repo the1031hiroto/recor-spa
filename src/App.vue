@@ -9,13 +9,13 @@
         <div class="col-12">
           <div class="row justify-content-end">
             <div class="col-auto my-2">
-              <button @click="linkPush('OffenceShow')" class="btn btn-outline-info btn-sm">打撃成績</button>
+              <button @click="linkPush('OffenceShow')" class="btn btn-outline-info">打撃成績</button>
             </div>
             <div class="col-auto my-2">
-              <button @click="linkPush('DeffenceShow')" class="btn btn-outline-info btn-sm">守備成績</button>
+              <button @click="linkPush('DeffenceShow')" class="btn btn-outline-info">守備成績</button>
             </div>
             <div class="col-auto my-2">
-              <button @click="linkPush('PitcherShow')" class="btn btn-outline-info btn-sm">投手成績</button>
+              <button @click="linkPush('PitcherShow')" class="btn btn-outline-info">投手成績</button>
             </div>
           </div>
         </div>

@@ -99,7 +99,7 @@
 
     <div v-if="isConfirmGame" class="modal1">
       <div>
-        <p class="list-group-item">対戦相手{{ versus }}</p>
+        <p class="list-group-item">対戦相手{{ versus['チーム名'] }}</p>
         <P>オーダー</P>
         <ul class="list-group mb-4">
             <li v-for="(batter, index) in batters" :key="index">{{ batter['選手名'] }}</li>
@@ -149,10 +149,10 @@
       <div class="col-12">
         <div class="row justify-content-end">
           <div class="col-auto">
-            <router-link tag="button" to="/offence-add" class="btn btn-outline-success btn-sm">打撃追加</router-link>
+            <router-link tag="button" to="/offence-add" class="btn btn-outline-success">打撃追加</router-link>
           </div>
           <div class="col-auto">
-            <router-link tag="button" to="/deffence-add" class="btn btn-outline-success btn-sm">守備追加</router-link>
+            <router-link tag="button" to="/deffence-add" class="btn btn-outline-success">守備追加</router-link>
           </div>
         </div>
       </div>
