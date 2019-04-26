@@ -1,7 +1,7 @@
 <template>
   <div class="signin">
     <h2>ログイン</h2>
-    <input type="text" placeholder="Username" v-model="username">
+    <input type="text" placeholder="Username" v-model="email">
     <input type="password" placeholder="Password" v-model="password">
     <button @click="signIn">ログイン</button>
     <p><router-link to="/signup">アカウント作成</router-link></p>
@@ -17,18 +17,18 @@ export default {
   name: 'Signin',
   data: function () {
       return {
-      username: '',
+      email: '',
       password: ''
       }
   },
   methods: {
     signIn: function () {
-      firebase.auth().signInWithEmailAndPassword(this.username, this.password)
+      firebase.auth().signInWithEmailAndPassword(this.email, this.password)
       .then(user => {
         user = firebase.auth().currentUser;
         store.commit('onAuthStateChanged', user);
         store.commit('onUserStatusChanged', user.uid ? true : false);
-        this.$router.push('/')
+        this.$router.push('team/' + user.displayName)
       },
       err => {
           alert(err.message)

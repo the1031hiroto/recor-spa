@@ -46,10 +46,14 @@ export default {
             pitcherData: [],
         };
     },
+    computed: {
+        currentTeam: function() {
+            return this.$store.getters.currentTeam;
+        }
+    },
     methods: {
         getData: function(){
-            const team = this.$store.uid
-            // const team = 'sB01dccqK5fSvXJy0wuvEXAaXwr1'
+            const team = this.currentTeam['uid']
             const directory = '/pitcher'
             const allRawpitcherData = firebase.database().ref(team + directory)
             let pitcherDataList = []

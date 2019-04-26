@@ -242,6 +242,11 @@ export default {
         // this.startAt = new Date(new Date().getFullYear(), 0, 1)
         this.getData(1000)
     },
+    computed: {
+        currentTeam: function() {
+            return this.$store.getters.currentTeam;
+        }
+    },
     data() {
         return {
             columns: columns,
@@ -303,7 +308,7 @@ export default {
         },
         getData: function(filterNum){
             // TODO: ログイン状態をみる
-            const team = this.$store.uid
+            const team = this.currentTeam['uid']
             const directory = '/offence'
             const allRawData = firebase.database().ref(team + directory)
             let offenceDataList = []

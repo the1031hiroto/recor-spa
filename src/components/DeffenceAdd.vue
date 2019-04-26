@@ -27,9 +27,14 @@ export default {
             deffences: [],
         };
     },
+    computed: {
+        currentUser: function() {
+            return this.$store.getters.user;
+        },
+    },
     methods: {
         getMembers: function () {
-            const team = this.$store.getters.user.uid
+            const team = this.currentUser['uid']
             const directory = '/members'
             const membersList = firebase.database().ref(team + directory)
             membersList.on('value', (snapshot) => {

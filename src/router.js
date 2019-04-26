@@ -19,7 +19,7 @@ let router =  new Router({
     routes: [
 
         {
-            path: '/',
+            path: '/team/:team',
             name: 'Home',
             component: Home
         },
@@ -44,19 +44,19 @@ let router =  new Router({
             component: DeffenceAdd,
             meta: { requiresAuth: true }
         },{
-            path: '/offence-show/:team',
+            path: '/team/:team/offence-show/',
             name: 'OffenceShow',
             component: OffenceShow
         },{
-            path: '/deffence-show/:team',
+            path: '/team/:team/deffence-show/',
             name: 'DeffenceShow',
             component: DeffenceShow,
         },{
-          path: '/pitcher-show/:team',
+          path: '/team/:team/pitcher-show/',
           name: 'PitcherShow',
           component: PitcherShow,
       },{
-        path: '/members/:name',
+        path: '/team/:team/members/:name',
         name: 'Members',
         component: Members,
     }
