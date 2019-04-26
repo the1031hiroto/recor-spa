@@ -265,10 +265,9 @@ export default {
     reduceDeffence: function () {
       this.deffences.pop()
     },
-    chengeName: function () {
-      let currentTeam = ''
+    chengeName: async function () {
       let user = firebase.auth().currentUser
-      user.updateProfile({
+      await user.updateProfile({
           displayName: this.teamName,
       }).then(function() {
         const uid = user.uid
@@ -281,8 +280,6 @@ export default {
           })
           const db = firebase.database().ref(directory + '/' + teamUid[0] + '/チーム名')
           db.set(user.displayName)
-
-          currentTeam = teamUid[0]
         })
         // TODO ちゃんとメッセージだす
         alert('done')
@@ -290,10 +287,9 @@ export default {
         alert(error.message)
       });
 
-      this.$store.commit('onUcurrentTeamChanged', currentTeam)
       user = firebase.auth().currentUser
       this.$store.commit('onAuthStateChanged', user);
-      // this.$router.replace({ name: 'Home', params: { team: currentTeam['チーム名'] }})
+      this.$router.replace({ name: 'Home', params: { team: user.displayName }})
     },
     checkMyPage: function () {
       if (this.isSignedIn) {
