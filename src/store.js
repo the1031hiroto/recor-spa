@@ -22,6 +22,12 @@ export default new Vuex.Store({
     onUcurrentTeamChanged(state, currentTeam) {
       state.currentTeam = currentTeam;
     },
+    onOrderStatusChanged(state, order) {
+      state.order = order;
+    },
+    onVersusChanged(state, versus) {
+      state.versus = versus;
+    },
     destroySession(state) {
       for (let key in state) {
         state[key] = null;
@@ -40,6 +46,9 @@ export default new Vuex.Store({
     },
     currentTeam(state) {
       return state.currentTeam;
+    },
+    versus(state) {
+      return state.versus;
     }
   },
   plugins: [createPersistedState()]

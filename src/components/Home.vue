@@ -163,6 +163,7 @@
 <script>
 import firebase from 'firebase/app';
 import 'firebase/database';
+import 'firebase/auth';
 import draggable from 'vuedraggable'
 import moment from 'moment'
 
@@ -175,17 +176,16 @@ export default {
     isSignedIn() {
       return this.$store.getters.isSignedIn;
     },
-    user() {
-      const displayName = this.$store.getters.user ? this.$store.getters.user : 'No Name'
-      return displayName;
+    currentUser() {
+      return this.$store.getters.user;
     },
     currentTeam: function() {
       return this.$store.getters.currentTeam;
     }
   },
-  // mounted() {
-  //   this.isMyPage = this.$route.params.team == this.$store.getters.user.displayName ? true : false
-  // },
+  mounted() {
+    this.checkMyPage()
+  },
   data () {
       return {
         isMyPage: false,
@@ -206,7 +206,7 @@ export default {
   },
   methods: {
     gameOn: function () {
-      const team = this.$store.getters.user.uid
+      const team = this.currentUser['uid']
       const directory = '/members'
       const membersList = firebase.database().ref(team + directory)
       membersList.on('value', (snapshot) => {
@@ -228,8 +228,7 @@ export default {
           "背番号": this.uniNum
 
       }
-      // const team = "WSKf7MiSevOyeMp6y7iorZyt4pk2"
-      const team = this.$store.getters.user.uid
+      const team = this.currentUser['uid']
       const directory = '/members'
       const db = firebase.database().ref(team + directory)
       db.push(result)
@@ -239,26 +238,24 @@ export default {
       this.isConfirm = false
     },
     submitGame: function () {
-      this.$store.state.versus = this.versus
-      this.$store.state.order = this.batters
+      this.$store.commit('onOrderStatusChanged', this.batters)
+      this.$store.commit('onVersusChanged', this.versus)
       let i = 0
+      const team = this.currentUser['uid']
       for (i in this.batters) {
         let result = {
             "試合日": moment(new Date()).format('YYYY/MM/DD'),
             "選手名": this.batters[i]['選手名'],
             "試合": 1
         }
-        // this.updateDB(result)
-        const team = this.$store.getters.user.uid
-        const directory = '/offence'
-        const db = firebase.database().ref(team + directory)
-        db.push(result)
+        const offenceDirectory = '/offence'
+        const offenceDB = firebase.database().ref(team + offenceDirectory)
+        offenceDB.push(result)
       }
 
-      const uid = this.$store.getters.user.uid
-      const directory = '/order'
-      const db = firebase.database().ref(uid + directory)
-      db.set(this.deffences)
+      const orderDirectory = '/order'
+      const orderDB = firebase.database().ref(team + orderDirectory)
+      orderDB.set(this.deffences)
 
       this.$router.push({ name: 'OffenceAdd' })
     },
@@ -269,7 +266,8 @@ export default {
       this.deffences.pop()
     },
     chengeName: function () {
-      const user = firebase.auth().currentUser
+      let currentTeam = ''
+      let user = firebase.auth().currentUser
       user.updateProfile({
           displayName: this.teamName,
       }).then(function() {
@@ -283,21 +281,31 @@ export default {
           })
           const db = firebase.database().ref(directory + '/' + teamUid[0] + '/チーム名')
           db.set(user.displayName)
-          // TODO currentTeamに入れる（thisがnull問題）
-          // this.$store.currentTeam = teamData[a[0]]
+
+          currentTeam = teamUid[0]
         })
         // TODO ちゃんとメッセージだす
         alert('done')
       }).catch(function(error) {
         alert(error.message)
       });
+
+      this.$store.commit('onUcurrentTeamChanged', currentTeam)
+      user = firebase.auth().currentUser
+      this.$store.commit('onAuthStateChanged', user);
+      // this.$router.replace({ name: 'Home', params: { team: currentTeam['チーム名'] }})
+    },
+    checkMyPage: function () {
+      if (this.isSignedIn) {
+        this.isMyPage = this.$route.params.team == this.currentUser.displayName ? true : false
+      }
     }
   },
-  // watch: {
-  //   '$route': function () {
-  //     this.isMyPage = this.$route.params.team == this.$store.getters.user.displayName ? true : false
-  //   }
-  // }
+  watch: {
+    '$route': function () {
+      this.checkMyPage()
+    }
+  }
 }
 </script>
 <style>

@@ -54,6 +54,11 @@ export default {
             ]
         };
     },
+    computed: {
+        currentUser: function() {
+            return this.$store.getters.user;
+        },
+    },
     methods: {
         subumitDeffence: function () {
             let result = {
@@ -65,8 +70,7 @@ export default {
                 "選手名": this.deffence.name
 
             }
-            // const team = "WSKf7MiSevOyeMp6y7iorZyt4pk2"
-            const team = this.$store.getters.user.uid
+            const team = this.currentUser['uid']
             const directory = '/deffence'
             const commentsRef = firebase.database().ref(team + directory)
             commentsRef.push(result)

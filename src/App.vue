@@ -104,8 +104,7 @@ export default {
           })
           const teamName = this.$route.params.team
           const team = teamList.filter(item => item['チーム名'] == teamName)
-          store.commit('onUcurrentTeamChanged', team[0]);
-          // this.$store.currentTeam = team[0]
+          this.$store.commit('onUcurrentTeamChanged', team[0]);
       })
     }
   }

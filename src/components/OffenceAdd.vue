@@ -123,16 +123,16 @@ import $ from 'jquery'
 export default {
     name: "offence-add",
     mounted() {
-        const team = this.$store.getters.user.uid
+        const team = this.currentUser['uid']
         const directory = '/members'
         const membersList = firebase.database().ref(team + directory)
         membersList.on('value', (snapshot) => {
             const members = Object.values(snapshot.val())
-            const order = this.$store.state.order
+            const order = this.myOrder
             this.batters = order.length ? order : members
         })
 
-        const versus = this.$store.state.versus.uid
+        const versus = this.versus['uid']
         if (versus) {
             const directoryOrder = '/order'
             const orders = firebase.database().ref(versus + directoryOrder)
@@ -143,6 +143,17 @@ export default {
 
         // document.getElementById( "target" ).addEventListener('click', this.getClickPosition, false);
         // document.getElementById( "target" ).addEventListener('touchstart', this.getClickPosition, false);
+    },
+    computed: {
+        currentUser: function() {
+            return this.$store.getters.user;
+        },
+        versus: function() {
+            return this.$store.getters.versus;
+        },
+        myOrder: function() {
+            return this.$store.getters.order;
+        }
     },
     data() {
         return {
@@ -243,7 +254,7 @@ export default {
             }
 
             this.updateDB(result)
-            if (this.$store.state.versus.uid) {
+            if (this.versus['uid']) {
                 this.updateVersusPitcher()
 
                 if (this.versusOrder.length || this.out || this.hit == "失策出" || this.hit == "ゲッツー崩れ") {
@@ -271,7 +282,7 @@ export default {
             this.isConfirmOther = false
         },
         updateDB: function (result) {
-            const team = this.$store.getters.user.uid
+            const team = this.currentUser['uid']
             const directory = '/offence'
             const db = firebase.database().ref(team + directory)
             db.push(result)
@@ -326,7 +337,7 @@ export default {
             this.updateVersusDB(a)
         },
         updateVersusDB: function (result) {
-            const versus = this.$store.state.versus.uid
+            const versus = this.versus['uid']
             const directory = '/deffence'
             const db = firebase.database().ref(versus + directory)
             db.push(result)
@@ -360,7 +371,7 @@ export default {
             if (this.out == "三振") {
                 result["奪三振"] = 1
             }
-            const versus = this.$store.state.versus.uid
+            const versus = this.versus['uid']
             const directory = '/pitcher'
             const db = firebase.database().ref(versus + directory)
             db.push(result)
