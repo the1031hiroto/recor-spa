@@ -20,6 +20,9 @@
         <div class="col-4 my-1">
             <button v-on:click="deffence.errorCount++" type="button" class="btn btn-outline-secondary btn-sm">エラー:{{ deffence.errorCount }}回</button>
         </div>
+
+        <div id="target" class="col-12" @click="getClickPosition" :style="{ 'background-image': 'url(' + assetsImage + ')' }"><font-awesome-icon icon="map-pin" id="map-pin" /></div>
+
         <div class="col-12 my-1 float-right">
                 <div class="float-right">
                 <button type="submit" class="btn btn-outline-primary">追加</button>
@@ -33,6 +36,7 @@
 import firebase from 'firebase/app';
 import 'firebase/database';
 import moment from 'moment'
+import $ from 'jquery'
 
 export default {
     name: "deffence-add-component",
@@ -51,7 +55,10 @@ export default {
                 { text: 'ライト', value: 'ライト' },
                 { text: 'センター', value: 'センター' },
                 { text: 'レフト', value: 'レフト' }
-            ]
+            ],
+            onBallX: "",
+            onBallY: "",
+            assetsImage: "/ground.jpg"
         };
     },
     computed: {
@@ -67,7 +74,11 @@ export default {
                 "捕殺": this.deffence.killSupportCount,
                 "刺殺": this.deffence.killCount,
                 "エラー": this.deffence.errorCount,
-                "選手名": this.deffence.name
+                "選手名": this.deffence.name,
+                "打球": {
+                    x: this.onBallX,
+                    y: this.onBallY
+                }
 
             }
             const team = this.currentUser['uid']
@@ -78,6 +89,23 @@ export default {
             this.deffence.killCount = 0
             this.deffence.killSupportCount = 0
             this.deffence.errorCount = 0
+            this.onBallX = 0
+            this.onBallY = 0
+        },
+        getClickPosition: function (e) {
+            // ページ内クリック位置にピン表示
+            $('#map-pin').offset({ top: e.pageY, left: e.pageX })
+
+            // 要素の位置を取得
+            const clientRect = document.getElementById( "target" ).getBoundingClientRect()
+            const positionX = clientRect.left + window.pageXOffset
+            const positionY = clientRect.top + window.pageYOffset
+
+            // 要素内クリック位置
+            if (e.clientX) {
+                this.onBallX = e.clientX - positionX
+                this.onBallY = e.clientY - positionY
+            }
         }
     },
 };

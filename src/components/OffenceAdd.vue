@@ -57,7 +57,7 @@
                 </div>
             </div>
         </form>
-        
+
         <form @submit.prevent="isConfirmOther = true" class="row border-bottom my-2 py-2">
             <div class="col-12 my-1 form-group">
                 <label>その他</label>
@@ -80,7 +80,7 @@
                 </div>
             </div>
         </form>
-        
+
         <div v-if="isConfirm" class="modal1">
             <div>
                 <ul class="list-group mb-4">
