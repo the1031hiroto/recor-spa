@@ -153,9 +153,6 @@ import firebase from 'firebase/app';
 import 'firebase/database';
 import vuejsDatepicker from 'vuejs-datepicker';
 import moment from 'moment'
-import Vue from 'vue'
-import ClientTable from 'vue-tables-2';
-Vue.use(ClientTable);
 
 const columns = [
     "選手名",
