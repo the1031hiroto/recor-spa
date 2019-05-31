@@ -1,6 +1,6 @@
 <template>
     <div id="deffence-show">
-        <h2>{{this.$route.params.team}}守備成績</h2>
+        <h2>{{this.$route.params.team}}<br>守備成績</h2>
         <b-table :items="deffenceData" :fields="columns" :sort-by.sync="sortBy" striped hover responsive small />
     </div>
 </template>

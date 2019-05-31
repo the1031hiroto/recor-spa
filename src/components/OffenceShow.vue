@@ -1,6 +1,6 @@
 <template>
     <div id="offence-show" class="container-fluid">
-        <h2>{{ this.$route.params.team }} 打撃成績</h2>
+        <h2>{{ this.$route.params.team }}<br>打撃成績</h2>
         <div class="row">
             <div class="col-6 my-2">
                 <vuejs-datepicker
@@ -42,109 +42,8 @@
             :fields="columns"
             :sort-by.sync="sortBy"
             :sort-desc.sync="sortDesc"
-            @row-clicked="linkMemebers"
+            @row-dblclicked="linkMemebers"
             striped hover responsive small />
-
-        <br>
-        <ul class="list-group">
-            <li class="list-group-item">
-                XR: EXtrapolated Runs 得点におけるチームへの貢献度 チームの全打者のXRを足すと、チームの総得点とほぼ同じになる
-                <br>
-                出典：<a href="https://www47.atwiki.jp/bbstats/pages/17.html" class="badge badge-secondary">野球関連指標まとめ</a>
-            </li>
-            <li class="list-group-item">
-                XR27: 1～9番まで任意の1人で打線を組んだら、一試合で何点獲れるかを表す。
-                <br>
-                出典：<a href="https://www47.atwiki.jp/bbstats/pages/17.html" class="badge badge-secondary">野球関連指標まとめ</a>
-            </li>
-            <li class="list-group-item">
-                wOBA: Weighted On Base Average 打席あたりにどれだけチームの得点増に貢献する打撃をしているか
-                <br>
-                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#wOBA" class="badge badge-secondary">野球関連指標まとめ</a>
-            </li>
-            <li class="list-group-item">
-                wRAA: Weighted Runs Above Average どれだけチームの得点を増やしたか、平均的な打者であればゼロ
-                <br>
-                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#wRAA" class="badge badge-secondary">Esse野球関連指標まとめ</a>
-            </li>
-            <li class="list-group-item">
-                選球眼(BB/K) = 四球 / 三振
-                <br>
-                三振数以上の四球を取る選手は手と目の連係動作に優れ、「バッティングのアプローチが適切で、ストライクゾーン管理能力に長けた打者」と評される。
-                <br>
-                出典：<a href="https://ja.wikipedia.org/wiki/%E9%81%B8%E7%90%83%E7%9C%BC" class="badge badge-secondary">フリー百科事典『ウィキペディア（Wikipedia）』</a>
-            </li>
-            <li class="list-group-item">
-                BABIP ＝ (安打数－本塁打数) ／ (打数＋犠飛－本塁打－三振)
-                <br>
-                フェアゾーンに飛んだ打球の内、安打になった割合を示す指標。
-                <br>
-                ボテボテの打球が内野安打になる、打ち損じた打球が野手の間に落ちるなどの幸運が多いシーズンは数値が高くなり、芯で捉えた打球が野手の正面を突くなど不運に見舞われたシーズンは数値が低くなる。
-                <br>
-                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#BABIP" class="badge badge-secondary">野球関連指標まとめ</a>
-            </li>
-            <li class="list-group-item">
-                NOI ＝ (出塁率＋長打率÷3) × 1000
-                <br>
-                出塁率の価値を3倍にしたOPS。450以上ならば平均的な打者、550以上ならば主力級の打者、600以上ならば一流打者となる。
-                <br>
-                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#NOI" class="badge badge-secondary">野球関連指標まとめ</a>
-            </li>
-            <li class="list-group-item">
-                GPA ＝ (出塁率×1.8＋長打率) / 4
-                <br>
-                出塁率の価値を1.8倍にしたOPS。
-                <br>
-                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#GPA" class="badge badge-secondary">野球関連指標まとめ</a>
-            </li>
-            <li class="list-group-item">
-                IsoD ＝ 出塁率 ー 打率
-                <br>
-                出塁率から打率を減算した数値で、「四死球によってどの程度出塁したか」を測れる四死球占有率である。評価基準は0.07から0.08あれば合格点、0.1越えならその分野では一流と言われている。
-                <br>
-                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#IsoD" class="badge badge-secondary">野球関連指標まとめ</a>
-            </li>
-            <li class="list-group-item">
-                純粋に長打力を評価するために作られた指標。すべての安打が単打であった場合、IsoPは0となる。
-                <br>
-                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#IsoP" class="badge badge-secondary">野球関連指標まとめ</a>
-            </li>
-            <li class="list-group-item">
-                ＰＡ／Ｋ ＝ 打席 ／ 三振
-                <br>
-                １三振するまでに掛かる打席数
-                <br>
-                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#PA/K" class="badge badge-secondary">野球関連指標まとめ</a>
-            </li>
-            <li class="list-group-item">
-                ＡＢ／ＨＲ ＝ 打数 ／ 本塁打
-                <br>
-                １本塁打を記録するまでに掛かる打数
-                <br>
-                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#AB/HR" class="badge badge-secondary">野球関連指標まとめ</a>
-            </li>
-            <li class="list-group-item">
-                SecA=（塁打数 - 安打 + 四球 + 盗塁 - 盗塁失敗）/ 打数
-                <br>
-                打率から長打の要素を抽出したもの。.500以上なら一流。
-                <br>
-                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#SecA" class="badge badge-secondary">野球関連指標まとめ</a>
-            </li>
-            <li class="list-group-item">
-                TA=（塁打数 + 四球 + 死球 + 盗塁 - 盗塁失敗）/（打数 - 安打 + 盗塁失敗 + 併殺打)
-                <br>
-                打者が１アウト当たりにどれだけの塁打を得ることが出来たかを示す指標。
-                <br>
-                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#TA" class="badge badge-secondary">野球関連指標まとめ</a>
-            </li>
-            <li class="list-group-item">
-                PS ＝ (本塁打 × 盗塁 × ２) ／ (本塁打 ＋ 盗塁)
-                <br>
-                パワー・機動力を兼ね揃えた選手かを見るための指標。P-Sと表記されることが多い？
-                <br>
-                出典：<a href="https://www47.atwiki.jp/bbstats/pages/14.html#PS" class="badge badge-secondary">野球関連指標まとめ</a>
-            </li>
-        </ul>
     </div>
 </template>
 
@@ -154,56 +53,81 @@ import 'firebase/database';
 import vuejsDatepicker from 'vuejs-datepicker';
 import moment from 'moment'
 
+// const columns = [
+//     "選手名",
+//     { key: '打率', sortable: true },
+//     { key: 'XR', sortable: true },
+//     { key: 'XR27', sortable: true },
+//     { key: 'WOBA', sortable: true },
+//     { key: 'WRAA', sortable: true },
+//     { key: '三振率', sortable: true },
+//     { key: '四球率', sortable: true },
+//     { key: 'BB/K', sortable: true },
+//     "NOI",
+//     "GPA",
+//     "ISOD",
+//     "PA/K",
+//     "SECA",
+//     "TA",
+//     "打点",
+//     "得点",
+//     "四球",
+//     "死球",
+//     "三振",
+//     "盗塁",
+//     "失策出",
+//     "出塁率",
+//     "得点圏打率"
+// ]
 const columns = [
     "選手名",
-    "打席数",
-    "打数",
-    "安打",
-    { key: '打率', sortable: true },
+    { key: '打席数', sortable: true },
+    { key: '打数', sortable: true },
+    { key: '安打', sortable: true },
     "三割(4打数)",
-    { key: 'XR', sortable: true },
-    { key: 'XR27', sortable: true },
-    { key: 'WOBA', sortable: true },
-    { key: 'WRAA', sortable: true },
+    { key: 'XR', thClass: 'xr', sortable: true },
+    { key: 'XR27', thClass: 'xr27', sortable: true },
+    { key: 'WOBA', thClass: 'woba', sortable: true },
+    { key: 'WRAA', thClass: 'wraa', sortable: true },
     { key: '三振率', sortable: true },
     { key: '四球率', sortable: true },
-    { key: 'BB/K', sortable: true },
-    "BABIP",
-    "NOI",
-    "GPA",
-    "ISOD",
-    "ISOP",
-    "PA/K",
-    "AB/HR",
-    "SECA",
-    "TA",
-    "PS",
-    "走者有",
-    "進塁打",
-    "進塁打率",
-    "ゴロアウト",
-    "フライアウト",
-    "試合",
-    "1塁打",
-    "2塁打",
-    "3塁打",
-    "本塁打",
-    "打点",
-    "得点",
-    "四球",
-    "死球",
-    "三振",
-    "併殺打",
-    "犠飛",
-    "犠打",
-    "盗塁",
-    "牽制死",
-    "失策出",
-    "塁打数",
-    "出塁率",
-    "長打率",
-    "OPS",
-    "得点圏打率"
+    { key: 'BB/K', thClass: 'bbk', sortable: true },
+    { key: 'BABIP', thClass: 'babip', sortable: true },
+    { key: 'NOI', thClass: 'noi', sortable: true },
+    { key: 'GPA', thClass: 'gpa', sortable: true },
+    { key: 'ISOD', thClass: 'isod', sortable: true },
+    { key: 'ISOP', thClass: 'isop', sortable: true },
+    { key: 'PA/K', thClass: 'pak', sortable: true },
+    { key: 'AB/HR', thClass: 'abhr', sortable: true },
+    { key: 'SECA', thClass: 'seca', sortable: true },
+    { key: 'TA', thClass: 'ta', sortable: true },
+    { key: 'PS', thClass: 'ps', sortable: true },
+    { key: '走者有', sortable: true },
+    { key: '進塁打', sortable: true },
+    { key: '進塁打率', sortable: true },
+    { key: 'ゴロアウト', sortable: true },
+    { key: 'フライアウト', sortable: true },
+    { key: '試合', sortable: true },
+    { key: '1塁打', sortable: true },
+    { key: '2塁打', sortable: true },
+    { key: '3塁打', sortable: true },
+    { key: '本塁打', sortable: true },
+    { key: '打点', sortable: true },
+    { key: '得点', sortable: true },
+    { key: '四球', sortable: true },
+    { key: '死球', sortable: true },
+    { key: '三振', sortable: true },
+    { key: '併殺打', sortable: true },
+    { key: '犠飛', sortable: true },
+    { key: '犠打', sortable: true },
+    { key: '盗塁', sortable: true },
+    { key: '牽制死', sortable: true },
+    { key: '失策出', sortable: true },
+    { key: '塁打数', sortable: true },
+    { key: '出塁率', sortable: true },
+    { key: '長打率', sortable: true },
+    { key: 'OPS', sortable: true },
+    { key: '得点圏打率', sortable: true },
 ]
 const dataColumns = [
     "打席数",
@@ -227,7 +151,8 @@ const dataColumns = [
     "走者有",
     "進塁打",
     "ゴロアウト",
-    "フライアウト"
+    "フライアウト",
+    "得点圏打率"
 ]
 export default {
     components: {
@@ -352,8 +277,7 @@ export default {
                 mainData[i]["ISOP"] = Math.floor((mainData[i]["長打率"] - mainData[i]["打率"]) * 100) / 100
                 mainData[i]["BB/K"] = (shishi / mainData[i]["三振"]).toFixed(3)
                 mainData[i]["PA/K"] = (mainData[i]["打席数"] / mainData[i]["三振"]).toFixed(3)
-                mainData[i]["AB/HR"] = (dasu / mainData[i]["本塁打"]).toFixed(3)
-                // ＡＢ／ＨＲ＝打数／本塁打
+                mainData[i]["AB/HR"] = mainData[i]["本塁打"] ? (dasu / mainData[i]["本塁打"]).toFixed(3) : 0
                 mainData[i]["XR"] = (
                     mainData[i]["1塁打"]
                     + mainData[i]["2塁打"] * 1.44
@@ -513,7 +437,7 @@ export default {
                 let k = 0
                 let items = {}
                 for (k in maxData) {
-                    const reverceData = ['三振', '三振率', '盗塁死', '牽制死', '併殺打']
+                    const reverceData = ['三振', '三振率', '盗塁死', '牽制死', '併殺打', 'AB/HR']
                     if (maxData[k] && mainData[i][k] == maxData[k] && !reverceData.includes(k)) {
                         items[k] = 'info'
                     } else if (maxData[k] && mainData[i][k] == maxData[k] && reverceData.includes(k)) {
@@ -573,6 +497,86 @@ td:first-child {
 }
 #offence-show .list-group {
     font-size: .5rem;
+}
+
+th::before {
+    position: absolute;
+    transition: all 0.3s ease 0s;
+    opacity: 0;
+    top: 0px;
+    left: 0px;
+    display: block;
+    padding: 0.2em 0.5em;
+    color: #ffffff;
+    border-radius: 6px;
+    background: #1b2538;
+    white-space: pre-line;
+    z-index: 999;
+    width: 90vw;
+    line-height: 1rem;
+}
+th.xr:hover::before,
+th.xr27:hover::before,
+th.woba:hover::before,
+th.wraa:hover::before,
+th.bbk:hover::before,
+th.babip:hover::before,
+th.noi:hover::before,
+th.gpa:hover::before,
+th.isod:hover::before,
+th.isop:hover::before,
+th.pak:hover::before,
+th.abhr:hover::before,
+th.seca:hover::before,
+th.ta:hover::before,
+th.ps:hover::before {
+    top: 4rem;
+    opacity: 1;
+}
+th.xr::before{
+    content: "XR: 得点におけるチームへの貢献度 チームの全打者のXRを足すと、チームの総得点とほぼ同じになる ";
+}
+th.xr27::before {
+    content: "XR27: 1～9番まで任意の1人で打線を組んだら、一試合で何点獲れるかを表す。";
+}
+th.woba::before {
+    content: "wOBA: 打席あたりにどれだけチームの得点増に貢献する打撃をしているか";
+}
+th.wraa::before {
+    content: "wRAA: どれだけチームの得点を増やしたか、平均的な打者であればゼロ ";
+}
+th.bbk::before {
+    content: "選球眼(BB/K) = 四球 / 三振\A三振数以上の四球を取る選手は手と目の連係動作に優れ、\A「バッティングのアプローチが適切で、ストライクゾーン管理能力に長けた打者」と評される。";
+}
+th.babip::before {
+    content: "BABIP ＝ (安打数 － 本塁打数) ／ (打数 ＋ 犠飛 － 本塁打 － 三振)\Aフェアゾーンに飛んだ打球の内、安打になった割合を示す指標。\Aボテボテの打球が内野安打になる、打ち損じた打球が野手の間に落ちるなどの幸運が多いシーズンは数値が高くなり、\A芯で捉えた打球が野手の正面を突くなど不運に見舞われたシーズンは数値が低くなる。 ";
+}
+th.noi::before {
+    content: "NOI ＝ (出塁率 ＋ 長打率÷3) × 1000\A出塁率の価値を3倍にしたOPS。450以上ならば平均的な打者、550以上ならば主力級の打者、600以上ならば一流打者となる";
+}
+th.gpa::before {
+    content: "GPA ＝ (出塁率×1.8 ＋ 長打率) / 4\A出塁率の価値を1.8倍にしたOPS。 ";
+}
+th.isod::before {
+    content: "IsoD ＝ 出塁率 ー 打率\A出塁率から打率を減算した数値で、「四死球によってどの程度出塁したか」を測れる四死球占有率である。\A評価基準は0.07から0.08あれば合格点、0.1越えならその分野では一流と言われている。 ";
+}
+th.isop::before {
+    content: "IsoP ＝ 長打 － 打率 ＝（二塁打 + 三塁打×2＋本塁打×3）÷打数\A純粋に長打力を評価するために作られた指標。すべての安打が単打であった場合、IsoPは0となる。";
+}
+th.pak::before {
+    content: "ＰＡ／Ｋ ＝ 打席 ／ 三振\A１三振するまでに掛かる打席数 ";
+}
+th.abhr::before {
+    content: "ＡＢ／ＨＲ ＝ 打数 ／ 本塁打\A１本塁打を記録するまでに掛かる打数 ";
+}
+th.seca::before {
+    content: "SecA =（塁打数 - 安打 + 四球 + 盗塁 - 盗塁失敗）/ 打数\A打率から長打の要素を抽出したもの。.500以上なら一流。 ";
+}
+th.ta::before {
+    content: "TA =（塁打数 + 四球 + 死球 + 盗塁 - 盗塁失敗）/（打数 - 安打 + 盗塁失敗 + 併殺打)\A打者が１アウト当たりにどれだけの塁打を得ることが出来たかを示す指標。 ";
+}
+th.ps::before {
+    content: "PS ＝ (本塁打 × 盗塁 × ２) ／ (本塁打 ＋ 盗塁)\Aパワー・機動力を兼ね揃えた選手かを見るための指標。P-Sと表記されることが多い？ ";
 }
 
 </style>

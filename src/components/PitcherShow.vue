@@ -1,6 +1,6 @@
 <template>
     <div id="pitcher-show">
-        <h2>{{this.$route.params.team}}投手成績</h2>
+        <h2>{{this.$route.params.team}}<br>投手成績</h2>
         <b-table :items="pitcherData" :fields="columns" :sort-by.sync="sortBy" striped hover responsive small />
     </div>
 </template>
