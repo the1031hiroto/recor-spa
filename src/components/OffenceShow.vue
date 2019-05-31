@@ -5,7 +5,7 @@
             <div class="col-6 my-2">
                 <vuejs-datepicker
                     v-model="selectDate"
-                    @input="changeTabu"
+                    @input="changeDate"
                     :format="customFormatter"
                     :highlighted="highlighted"
                     placeholder="日付で絞り込む"
@@ -20,14 +20,14 @@
             </div>
             <div class="col-4 mb-3">
                 <button
-                    @click="changeTabu(new Date(new Date().getFullYear(), -12, 1), new Date(new Date().getFullYear(), 11, 31))"
-                    :class="{'active': startAt === new Date(new Date().getFullYear(), 11, 31)}"
-                    class="btn btn-outline-success btn-sm">トータル</button>
+                    @click="changeDate(startOfFullYear, endOfThisYear)"
+                    :class="{'active': startAt === startOfFullYear}"
+                    class="btn btn-outline-success btn-sm">トータル {{startOfFullYear[0]}}〜</button>
             </div>
             <div class="col-4 mb-3">
                 <button
-                    @click="changeTabu(new Date(new Date().getFullYear(), 0, 1), new Date(new Date().getFullYear(), 11, 31))"
-                    :class="{'active': startAt === new Date(new Date().getFullYear(), 0, 1)}"
+                    @click="changeDate()"
+                    :class="{'active': startAt === startOfThisYear}"
                     class="btn btn-outline-success btn-sm">今シーズン</button>
             </div>
             <div class="col-4 mb-3">
@@ -84,6 +84,7 @@ const columns = [
     { key: '打席数', sortable: true },
     { key: '打数', sortable: true },
     { key: '安打', sortable: true },
+    { key: '打率', sortable: true },
     "三割(4打数)",
     { key: 'XR', thClass: 'xr', sortable: true },
     { key: 'XR27', thClass: 'xr27', sortable: true },
@@ -154,63 +155,71 @@ const dataColumns = [
     "フライアウト",
     "得点圏打率"
 ]
+const startOfThisYear = new Date(new Date().getFullYear(), 0, 1)
+const endOfThisYear = new Date(new Date().getFullYear(), 11, 31)
+
 export default {
     components: {
         vuejsDatepicker
     },
     name: "offence-show",
     mounted() {
-        // TODO:デフォルトで「今シーズン」選択
-        // this.startAt = new Date(new Date().getFullYear(), 0, 1)
-        this.getData(1000)
+        this.getData()
     },
     computed: {
         currentTeam: function() {
             return this.$store.getters.currentTeam;
-        }
+        },
+        startOfFullYear: function() {
+            const firebase = this.intFirebase()
+            var returnArr = [];
+            firebase.orderByChild("試合日").limitToFirst(1).on('value', (snapshot) => {
+                returnArr.push(Object.values(snapshot.val())[0]['試合日']);
+            })
+            return returnArr
+        },
+        highlighted: function() {
+            var result = {dates: []};
+            let days = []
+            const firebase = this.intFirebase()
+            firebase.orderByChild("試合日").on('value', (snapshot) => {
+                Object.values(snapshot.val()).filter( function( value  ) {
+                    for( var i in days ) {
+                        if( days[i] == value["試合日"] ) return
+                    }
+                    days.push(value["試合日"])
+                })
+                result['dates'] = days.map(x => new Date(x));
+            })
+            return result
+        },
     },
     data() {
         return {
             columns: columns,
             sortBy: '打率',
             sortDesc: true,
-            // options: {
-            //     columnsDropdown: true,
-
-            //     sortable: [
-            //         'id', 'name'
-            //     ],
-            // },
             mainData: [0],
             showData: [0],
-            startAt: new Date(new Date().getFullYear(), 0, 1),
-            endAt: new Date(new Date().getFullYear(), 11, 31),
+            startOfThisYear: startOfThisYear,
+            endOfThisYear: endOfThisYear,
+            startAt: startOfThisYear,
+            endAt: endOfThisYear,
             selectDate: "",
             isRegulation: false,
             regulationNum: 0,
             isRecent20: false,
-            highlighted: {
-                dates: [//TODO: 動的に取得
-                    new Date("2019/02/03"),
-                    new Date("2019/02/10"),
-                    new Date("2019/02/17"),
-                    new Date("2019/02/24"),
-                    new Date("2019/03/10")
-                ],
-            }
         };
     },
     methods: {
         customFormatter(date) {
             return moment(date).format('YYYY/MM/DD');
         },
-        changeTabu: function (startAt, endAt) {
+        changeDate: function (startAt, endAt) {
             this.isRegulation = false
             this.isRecent20 = false
             this.regulationNum = 0
-            this.startAt = startAt
-            this.endAt = endAt ? endAt : startAt
-            this.getData(1000)
+            this.getData(1000, startAt, endAt)
         },
         regulation: function() {
             this.isRegulation = true
@@ -228,13 +237,16 @@ export default {
             this.isRecent20 = true
             this.getData(20)
         },
-        getData: function(filterNum){
-            // TODO: ログイン状態をみる
+        intFirebase: function() {
             const team = this.currentTeam['uid']
             const directory = '/offence'
-            const allRawData = firebase.database().ref(team + directory)
+            return firebase.database().ref(team + directory)
+        },
+        getData: function(filterNum = 1000, startAt = startOfThisYear, endAt = endOfThisYear){
+            // TODO: ログイン状態をみる
+            const firebase = this.intFirebase()
             let offenceDataList = []
-            allRawData.orderByChild("試合日").startAt(moment(this.startAt).format('YYYY/MM/DD')).endAt(moment(this.endAt).format('YYYY/MM/DD')).on('value', (snapshot) => {
+            firebase.orderByChild("試合日").startAt(moment(startAt).format('YYYY/MM/DD')).endAt(moment(endAt).format('YYYY/MM/DD')).on('value', (snapshot) => {
                 const offenceData = snapshot.val()
                 Object.keys(offenceData).forEach(function (k, i) {
                     offenceDataList[i] = offenceData[k]
