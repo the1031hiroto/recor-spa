@@ -20,14 +20,14 @@
             </div>
             <div class="col-4 mb-3">
                 <button
-                    @click="changeDate(startOfFullYear, endOfThisYear)"
-                    :class="{'active': startAt === startOfFullYear}"
+                    @click="fullYear = true; changeRange()"
+                    :class="{'active': fullYear === true}"
                     class="btn btn-outline-success btn-sm">トータル {{startOfFullYear[0]}}〜</button>
             </div>
             <div class="col-4 mb-3">
                 <button
-                    @click="changeDate()"
-                    :class="{'active': startAt === startOfThisYear}"
+                    @click="fullYear = false; changeRange()"
+                    :class="{'active': fullYear === false}"
                     class="btn btn-outline-success btn-sm">今シーズン</button>
             </div>
             <div class="col-4 mb-3">
@@ -164,9 +164,12 @@ export default {
     },
     name: "offence-show",
     mounted() {
-        this.getData()
+        this.mainData
     },
     computed: {
+        mainData: function() {
+            return this.getData()
+        },
         currentTeam: function() {
             return this.$store.getters.currentTeam;
         },
@@ -199,77 +202,74 @@ export default {
             columns: columns,
             sortBy: '打率',
             sortDesc: true,
-            mainData: [0],
             showData: [0],
-            startOfThisYear: startOfThisYear,
-            endOfThisYear: endOfThisYear,
-            startAt: startOfThisYear,
-            endAt: endOfThisYear,
             selectDate: "",
             isRegulation: false,
             regulationNum: 0,
             isRecent20: false,
+            fullYear: false,
+            fullData: null,
         };
     },
     methods: {
         customFormatter(date) {
             return moment(date).format('YYYY/MM/DD');
         },
+        changeRange: function () {
+            this.isRegulation = false
+            this.isRecent20 = false
+            this.regulationNum = 0
+            this.fullData = this.fullData || this.getData(this.startOfFullYear, startOfThisYear)
+            this.fullYear ? this.filterData(1000, this.fullData) : this.filterData(1000, this.mainData)
+        },
         changeDate: function (startAt, endAt) {
             this.isRegulation = false
             this.isRecent20 = false
             this.regulationNum = 0
-            this.getData(1000, startAt, endAt)
+            this.getData(startAt, endAt)
         },
         regulation: function() {
             this.isRegulation = true
-            this.showData = [0]
-            for (let i = 0; i < this.mainData.length; i++) {
-                if (this.mainData[i]["打席数"] >= this.regulationNum) {
-                    this.showData[i] = this.mainData[i]
-                }
-            }
-            this.showData = this.showData.filter(v => v)
-            this.showData = this.statistic(this.showData)
+            this.showData = this.showData.filter(v => v["打席数"] >= this.regulationNum )
         },
         recent20: function() {
             this.isRegulation = false
             this.isRecent20 = true
-            this.getData(20)
+            this.filterData(20)
         },
         intFirebase: function() {
             const team = this.currentTeam['uid']
             const directory = '/offence'
             return firebase.database().ref(team + directory)
         },
-        getData: function(filterNum = 1000, startAt = startOfThisYear, endAt = endOfThisYear){
-            // TODO: ログイン状態をみる
+        getData: function(startAt = startOfThisYear, endAt = endOfThisYear){
+            let data = []
             const firebase = this.intFirebase()
-            let offenceDataList = []
             firebase.orderByChild("試合日").startAt(moment(startAt).format('YYYY/MM/DD')).endAt(moment(endAt).format('YYYY/MM/DD')).on('value', (snapshot) => {
                 const offenceData = snapshot.val()
                 Object.keys(offenceData).forEach(function (k, i) {
-                    offenceDataList[i] = offenceData[k]
+                    data[i] = offenceData[k]
                 })
-                let sumOffenceData = offenceDataList.reduce(function (result, current) {
-                    result.map(item => Object.entries(item).map(([key, value]) => item[key] = value || 0));
-                    let element = result.find(name => name['選手名'] === current['選手名']);
-
-                    if (element) {
-                        element['選手名'] = current['選手名']
-                        dataColumns.map(item => { element[item] += current[item] && element['打席数'] < filterNum ? current[item] : 0 });
-                    } else {
-                        let data = { '選手名' : current['選手名'] }
-                        dataColumns.forEach(item => { data[item] = current[item] ? current[item] : 0 });
-                        result.push(data)
-                    }
-                    return result
-                }, [])
-                this.mainData = sumOffenceData
-                // console.log(sumOffenceData)
-                this.mainData = this.statistic(sumOffenceData)
-                this.showData = this.mainData
+                this.filterData(1000, data)
             })
+            return data
+        },
+        filterData: function(filterNum = 1000, data = this.mainData){
+            const filteredData = data.reduce(function (result, current) {
+                result.map(item => Object.entries(item).map(([key, value]) => item[key] = value || 0));
+                let element = result.find(name => name['選手名'] === current['選手名']);
+
+                if (element) {
+                    element['選手名'] = current['選手名']
+                    dataColumns.map(item => { element[item] += current[item] && element['打席数'] < filterNum ? current[item] : 0 });
+                } else {
+                    let data = { '選手名' : current['選手名'] }
+                    dataColumns.forEach(item => { data[item] = current[item] ? current[item] : 0 });
+                    result.push(data)
+                }
+                return result
+            }, [])
+            this.showData = this.statistic(filteredData)
         },
         statistic: function(mainData) {
             for (let i = 0; i < mainData.length; i++) {
@@ -470,7 +470,7 @@ export default {
         },
     },
     beforeRouteUpdate (to, from , next) {
-        this.getData()
+        this.filterData()
         next()
     }
 };
