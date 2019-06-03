@@ -445,19 +445,28 @@ export default {
                 }
             }
 
-            for (let i = 0; i < mainData.length; i++) {
-                let k = 0
+            for (let i in mainData) {
                 let items = {}
-                for (k in maxData) {
+                for (let k in maxData) {
                     const reverceData = ['三振', '三振率', '盗塁死', '牽制死', '併殺打', 'AB/HR']
-                    if (maxData[k] && mainData[i][k] == maxData[k] && !reverceData.includes(k)) {
-                        items[k] = 'info'
-                    } else if (maxData[k] && mainData[i][k] == maxData[k] && reverceData.includes(k)) {
-                        items[k] = 'danger'
-                    } else if (minData[k] && mainData[i][k] == minData[k] && !reverceData.includes(k)) {
-                        items[k] = 'danger'
-                    } else if (minData[k] && mainData[i][k] == minData[k] && reverceData.includes(k)) {
-                        items[k] = 'info'
+                    if (!maxData[k]) {
+                        break
+                    }
+                    if (mainData[i][k] == maxData[k]) {
+                        if (reverceData.includes(k)) {
+                            items[k] = 'danger'
+                        } else {
+                            items[k] = 'info'
+                        }
+                        break
+                    }
+                    if (mainData[i][k] == minData[k]) {
+                        if (reverceData.includes(k)) {
+                            items[k] = 'info'
+                        } else {
+                            items[k] = 'danger'
+                        }
+                        break
                     }
                     mainData[i]['_cellVariants'] = items
                 }
