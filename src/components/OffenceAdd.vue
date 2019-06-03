@@ -241,7 +241,7 @@ export default {
                 result["打数"] = 1
             }
 
-            if (!(this.hit == "四球" || this.hit == "死球" || this.out == "三振") && this.onBall) {
+            if (!(this.hit == "四球" || this.hit == "死球" || this.out == "三振") && this.onBallX) {
                 result["打球"] = { x: this.onBallX, y: this.onBallY }
             }
 
