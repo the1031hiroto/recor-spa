@@ -160,7 +160,7 @@ export default {
             let days = []
             const firebase = this.intFirebase()
             firebase.orderByChild("試合日").on('value', (snapshot) => {
-                Object.values(snapshot.val()).filter( function( value  ) {
+                Object.values(snapshot.val()).filter( ( value  ) => {
                     for( var i in days ) {
                         if( days[i] == value["試合日"] ) return
                     }
@@ -221,15 +221,13 @@ export default {
             const firebase = this.intFirebase()
             firebase.orderByChild("試合日").startAt(moment(startAt).format('YYYY/MM/DD')).endAt(moment(endAt).format('YYYY/MM/DD')).on('value', (snapshot) => {
                 const offenceData = snapshot.val()
-                Object.keys(offenceData).forEach(function (k, i) {
-                    data[i] = offenceData[k]
-                })
+                Object.keys(offenceData).forEach( (k, i) => data[i] = offenceData[k] )
                 this.filterData(1000, data)
             })
             return data
         },
         filterData: function(filterNum = 1000, data = this.mainData){
-            const filteredData = data.reduce(function (result, current) {
+            const filteredData = data.reduce( (result, current) => {
                 result.map(item => Object.entries(item).map(([key, value]) => item[key] = value || 0));
                 let element = result.find(name => name['選手名'] === current['選手名']);
 
