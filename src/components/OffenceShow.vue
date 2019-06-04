@@ -53,32 +53,6 @@ import 'firebase/database';
 import vuejsDatepicker from 'vuejs-datepicker';
 import moment from 'moment'
 
-// const columns = [
-//     "選手名",
-//     { key: '打率', sortable: true },
-//     { key: 'XR', sortable: true },
-//     { key: 'XR27', sortable: true },
-//     { key: 'WOBA', sortable: true },
-//     { key: 'WRAA', sortable: true },
-//     { key: '三振率', sortable: true },
-//     { key: '四球率', sortable: true },
-//     { key: 'BB/K', sortable: true },
-//     "NOI",
-//     "GPA",
-//     "ISOD",
-//     "PA/K",
-//     "SECA",
-//     "TA",
-//     "打点",
-//     "得点",
-//     "四球",
-//     "死球",
-//     "三振",
-//     "盗塁",
-//     "失策出",
-//     "出塁率",
-//     "得点圏打率"
-// ]
 const columns = [
     "選手名",
     { key: '打席数', sortable: true },
@@ -273,71 +247,71 @@ export default {
         },
         statistic: function(mainData) {
             for (let i in mainData) {
-                const dasu = mainData[i]["打数"]
-                const shishi = mainData[i]["四球"] + mainData[i]["死球"]
-                mainData[i]["安打"] = mainData[i]["1塁打"] + mainData[i]["2塁打"] + mainData[i]["3塁打"] + mainData[i]["本塁打"]
-                mainData[i]["塁打数"] = mainData[i]["1塁打"] + mainData[i]["2塁打"] * 2 + mainData[i]["3塁打"] * 3 + mainData[i]["本塁打"]* 4
-                mainData[i]["打率"] = Math.floor(mainData[i]["安打"] / dasu * 1000) / 1000
-                mainData[i]["三割(4打数)"] = this.calculate_tree_ratio(mainData[i]["安打"], dasu)
-                const x = (mainData[i]["安打"] + shishi) / (dasu + shishi + mainData[i]["犠飛"] + mainData[i]["犠打"])
-                mainData[i]["出塁率"] = Math.floor(x * 100) / 100
-                mainData[i]["ISOD"] = Math.floor((mainData[i]["出塁率"] - mainData[i]["打率"]) * 100) / 100
-                mainData[i]["長打率"] = Math.floor(mainData[i]["塁打数"] / dasu * 100) / 100
-                mainData[i]["OPS"] = (mainData[i]["長打率"] + mainData[i]["出塁率"]).toFixed(3)
-                mainData[i]["NOI"] = ((mainData[i]["長打率"] + mainData[i]["出塁率"] / 3) * 1000).toFixed(3)
-                mainData[i]["GPA"] = ((mainData[i]["長打率"] * 1.8 + mainData[i]["出塁率"]) / 4).toFixed(3)
-                mainData[i]["ISOP"] = Math.floor((mainData[i]["長打率"] - mainData[i]["打率"]) * 100) / 100
-                mainData[i]["BB/K"] = (shishi / mainData[i]["三振"]).toFixed(3)
-                mainData[i]["PA/K"] = (mainData[i]["打席数"] / mainData[i]["三振"]).toFixed(3)
-                mainData[i]["AB/HR"] = mainData[i]["本塁打"] ? (dasu / mainData[i]["本塁打"]).toFixed(3) : 0
-                mainData[i]["XR"] = (
-                    mainData[i]["1塁打"]
-                    + mainData[i]["2塁打"] * 1.44
-                    + mainData[i]["3塁打"] * 2.08
-                    + mainData[i]["本塁打"] * 2.88
+                const data = mainData[i]
+                const shishi = data["四球"] + data["死球"]
+                data["安打"] = data["1塁打"] + data["2塁打"] + data["3塁打"] + data["本塁打"]
+                data["塁打数"] = data["1塁打"] + data["2塁打"] * 2 + data["3塁打"] * 3 + data["本塁打"]* 4
+                data["打率"] = Math.floor(data["安打"] / data["打数"] * 1000) / 1000
+                data["三割(4打数)"] = this.calculate_tree_ratio(data["安打"], data["打数"])
+                const x = (data["安打"] + shishi) / (data["打数"] + shishi + data["犠飛"] + data["犠打"])
+                data["出塁率"] = Math.floor(x * 100) / 100
+                data["ISOD"] = Math.floor((data["出塁率"] - data["打率"]) * 100) / 100
+                data["長打率"] = Math.floor(data["塁打数"] / data["打数"] * 100) / 100
+                data["OPS"] = (data["長打率"] + data["出塁率"]).toFixed(3)
+                data["NOI"] = ((data["長打率"] + data["出塁率"] / 3) * 1000).toFixed(3)
+                data["GPA"] = ((data["長打率"] * 1.8 + data["出塁率"]) / 4).toFixed(3)
+                data["ISOP"] = Math.floor((data["長打率"] - data["打率"]) * 100) / 100
+                data["BB/K"] = (shishi / data["三振"]).toFixed(3)
+                data["PA/K"] = (data["打席数"] / data["三振"]).toFixed(3)
+                data["AB/HR"] = data["本塁打"] ? (data["打数"] / data["本塁打"]).toFixed(3) : 0
+                data["XR"] = (
+                    data["1塁打"]
+                    + data["2塁打"] * 1.44
+                    + data["3塁打"] * 2.08
+                    + data["本塁打"] * 2.88
                     + shishi * 0.68
-                    + mainData[i]["盗塁"] * 0.36
-                    + (dasu - mainData[i]["安打"] - mainData[i]["三振"]) * (-0.18)
-                    + mainData[i]["三振"] * (-0.196)
-                    + mainData[i]["併殺打"] * (-0.74)
-                    + mainData[i]["犠飛"] * 0.74
-                    + mainData[i]["犠打"] * 0.08
-                    + mainData[i]["牽制死"] * (-0.64)
+                    + data["盗塁"] * 0.36
+                    + (data["打数"] - data["安打"] - data["三振"]) * (-0.18)
+                    + data["三振"] * (-0.196)
+                    + data["併殺打"] * (-0.74)
+                    + data["犠飛"] * 0.74
+                    + data["犠打"] * 0.08
+                    + data["牽制死"] * (-0.64)
                 ).toFixed(2)
 
-                mainData[i]["XR27"] = (
-                    mainData[i]["XR"] /
-                    (dasu -
-                    mainData[i]["安打"] +
-                    mainData[i]["牽制死"] +
-                    mainData[i]["犠飛"] +
-                    mainData[i]["犠打"] +
-                    mainData[i]["併殺打"]) * 27
+                data["XR27"] = (
+                    data["XR"] /
+                    (data["打数"] -
+                    data["安打"] +
+                    data["牽制死"] +
+                    data["犠飛"] +
+                    data["犠打"] +
+                    data["併殺打"]) * 27
                 ).toFixed(2)
 
-                mainData[i]["WOBA"] = (
-                    0.692 * mainData[i]["四球"] +
-                    0.73 * mainData[i]["死球"] +
-                    0.966 * mainData[i]["失策出"] +
-                    0.865 * mainData[i]["1塁打"] +
-                    1.334 * mainData[i]["2塁打"] +
-                    1.725 * mainData[i]["3塁打"] +
-                    2.065 * mainData[i]["本塁打"]
-                ) / (dasu + shishi + mainData[i]["犠飛"])
-                mainData[i]["WOBA"] = mainData[i]["WOBA"] ? Math.floor(mainData[i]["WOBA"] * 100) / 100 : 0
+                data["WOBA"] = (
+                    0.692 * data["四球"] +
+                    0.73 * data["死球"] +
+                    0.966 * data["失策出"] +
+                    0.865 * data["1塁打"] +
+                    1.334 * data["2塁打"] +
+                    1.725 * data["3塁打"] +
+                    2.065 * data["本塁打"]
+                ) / (data["打数"] + shishi + data["犠飛"])
+                data["WOBA"] = data["WOBA"] ? Math.floor(data["WOBA"] * 100) / 100 : 0
 
-                mainData[i]["三振率"] = (mainData[i]["三振"] / mainData[i]["打席数"]).toFixed(3)
-                mainData[i]["四球率"] = (mainData[i]["四球"] / mainData[i]["打席数"]).toFixed(3)
-                mainData[i]["進塁打率"] = (mainData[i]["進塁打"] / mainData[i]["走者有"]).toFixed(3)
+                data["三振率"] = (data["三振"] / data["打席数"]).toFixed(3)
+                data["四球率"] = (data["四球"] / data["打席数"]).toFixed(3)
+                data["進塁打率"] = (data["進塁打"] / data["走者有"]).toFixed(3)
 
-                mainData[i]["BABIP"] = ((mainData[i]["安打"] - mainData[i]["本塁打"]) / (dasu + mainData[i]["犠打"] - mainData[i]["本塁打"] - mainData[i]["三振"])).toFixed(3)
-                const caughtStealing = mainData[i]["盗塁死"] ? mainData[i]["盗塁死"] : 0
-                mainData[i]["SECA"] = ((mainData[i]["塁打数"] - mainData[i]["安打"] + mainData[i]["四球"] + mainData[i]["盗塁"] - caughtStealing) / dasu).toFixed(3)
-                mainData[i]["TA"] = (
-                    (mainData[i]["塁打数"] + shishi + mainData[i]["盗塁"] - caughtStealing) /
-                    (dasu - mainData[i]["安打"] + caughtStealing + mainData[i]["併殺打"])
+                data["BABIP"] = ((data["安打"] - data["本塁打"]) / (data["打数"] + data["犠打"] - data["本塁打"] - data["三振"])).toFixed(3)
+                const caughtStealing = data["盗塁死"] ? data["盗塁死"] : 0
+                data["SECA"] = ((data["塁打数"] - data["安打"] + data["四球"] + data["盗塁"] - caughtStealing) / data["打数"]).toFixed(3)
+                data["TA"] = (
+                    (data["塁打数"] + shishi + data["盗塁"] - caughtStealing) /
+                    (data["打数"] - data["安打"] + caughtStealing + data["併殺打"])
                 ).toFixed(3)
-                mainData[i]["PS"] = ((mainData[i]["本塁打"] * mainData[i]["盗塁"] * 2) / (mainData[i]["本塁打"] + mainData[i]["盗塁"])).toFixed(3)
+                data["PS"] = ((data["本塁打"] * data["盗塁"] * 2) / (data["本塁打"] + data["盗塁"])).toFixed(3)
 
             }
             this.calculation_WOBA_avr(mainData)
