@@ -367,112 +367,37 @@ export default {
                 }
         },
         findMax: function(mainData) {
-            let dataList = {
-                "game_id": [],
-                "選手名": [],
-                "試合": [],
-                "打席数": [],
-                "打数": [],
-                "1塁打": [],
-                "2塁打": [],
-                "3塁打": [],
-                "本塁打": [],
-                "安打": [],
-                "打点": [],
-                "得点": [],
-                "四球": [],
-                "死球": [],
-                "三振": [],
-                "併殺打": [],
-                "犠飛": [],
-                "犠打": [],
-                "盗塁": [],
-                "盗死": [],
-                "牽制死": [],
-                "失策出": [],
-                "塁打数": [],
-                "打率": [],
-                "出塁率": [],
-                "長打率": [],
-                "OPS": [],
-                "得点圏打率": [],
-                "三振率": [],
-                "四球率": [],
-                "BB/K": [],
-                "XR": [],
-                "XR27": [],
-                "WOBA": [],
-                "WRAA": [],
-                "ゴロアウト": [],
-                "フライアウト": [],
-                "打球": [],
-                "走者有": [],
-                "進塁打": [],
-                "進塁打率": [],
-                "得点圏": [],
-                "ゲッツー崩れ": [],
-                "試合日": [],
-                "三割(4打数)": [],
-                "BABIP": [],
-                "NOI": [],
-                "GPA": [],
-                "ISOD": [],
-                "ISOP": [],
-                "PA/K": [],
-                "AB/HR": [],
-                "SECA": [],
-                "TA": [],
-                "PS": [],
-                "_cellVariants": []
-            }
-            let i = 0
-            let x = []
-            for (i in mainData) {
-                for (x in mainData[i]) {
-                    dataList[x].push(mainData[i][x])
+            const dataList = mainData.reduce((result, current) => {
+                for (let p in current) {
+                    result[p] ? result[p].push(current[p]) : result[p] = []
                 }
-            }
+                return result
+            }, {})
 
             let maxData = Object.assign({}, dataList);
             let minData = Object.assign({}, dataList);
-            for (i in maxData) {
-                try{
-                    maxData[i] = Math.max.apply(null, maxData[i])
-                    minData[i] = Math.min.apply(null, minData[i])
-                } catch(e){
-                    maxData[i] = 0
-                    minData[i] = 0
-                }
+            for (let i in maxData) {
+                maxData[i] = Math.max.apply(null, maxData[i]) || 0
+                minData[i] = Math.min.apply(null, minData[i]) || 0
             }
 
-            for (let i in mainData) {
+            const reverceData = ['三振', '三振率', '盗塁死', '牽制死', '併殺打', 'AB/HR']
+            for (let j in mainData) {
                 let items = {}
                 for (let k in maxData) {
-                    const reverceData = ['三振', '三振率', '盗塁死', '牽制死', '併殺打', 'AB/HR']
-                    if (!maxData[k]) {
-                        break
+                    if (!maxData[k]) continue
+
+                    if (mainData[j][k] == maxData[k]) {
+                        items[k] = reverceData.includes(k) ? 'danger' : 'info'
+                        continue
+                    } else if (mainData[j][k] == minData[k]) {
+                        items[k] = reverceData.includes(k) ? 'info' : 'danger'
+                        continue
                     }
-                    if (mainData[i][k] == maxData[k]) {
-                        if (reverceData.includes(k)) {
-                            items[k] = 'danger'
-                        } else {
-                            items[k] = 'info'
-                        }
-                        break
-                    }
-                    if (mainData[i][k] == minData[k]) {
-                        if (reverceData.includes(k)) {
-                            items[k] = 'info'
-                        } else {
-                            items[k] = 'danger'
-                        }
-                        break
-                    }
-                    mainData[i]['_cellVariants'] = items
+                    mainData[j]['_cellVariants'] = items
                 }
             }
             this.regulationNum = maxData['試合'] * 2
-            return maxData
         },
         linkMemebers(record) {
             this.$router.replace({ name: 'Members', params: { name: record['選手名'] }})
