@@ -272,7 +272,7 @@ export default {
             this.showData = this.statistic(filteredData)
         },
         statistic: function(mainData) {
-            for (let i = 0; i < mainData.length; i++) {
+            for (let i in mainData) {
                 const dasu = mainData[i]["打数"]
                 const shishi = mainData[i]["四球"] + mainData[i]["死球"]
                 mainData[i]["安打"] = mainData[i]["1塁打"] + mainData[i]["2塁打"] + mainData[i]["3塁打"] + mainData[i]["本塁打"]
@@ -341,30 +341,24 @@ export default {
 
             }
             this.calculation_WOBA_avr(mainData)
-            return mainData
-        },
-        calculation_WOBA_avr: function(mainData) {
-            let WOBA_avr = 0
-            for (let i = 0; i < mainData.length; i++) {
-                WOBA_avr += mainData[i]["WOBA"]
-            }
-            WOBA_avr /= mainData.length
-            this.add_WRAA(mainData, WOBA_avr)
-        },
-        add_WRAA: function(mainData, WOBA_avr) {
-            for (let i = 0; i < mainData.length; i++) {
-                mainData[i]["WRAA"] = ((mainData[i]["WOBA"]- WOBA_avr) / 1.24 * mainData[i]["打数"]).toFixed(2)
-            }
             this.findMax(mainData)
             return mainData
         },
+        calculation_WOBA_avr: function(mainData) {
+            const WOBA_sum = mainData.reduce((result, current) => {
+                return result + current["WOBA"] || 0
+            },0)
+            this.add_WRAA(mainData, WOBA_sum / mainData.length)
+        },
+        add_WRAA: function(mainData, WOBA_avr) {
+            for (let i in mainData) {
+                mainData[i]["WRAA"] = ((mainData[i]["WOBA"] - WOBA_avr) / 1.24 * mainData[i]["打数"]).toFixed(2)
+            }
+        },
         calculate_tree_ratio: function(anda, dasu) {
-            let k = 0
-            for (k = 0; k <= 4; k++) {
-                    if( ( (anda + k) / (dasu + 4) ) >= 0.3 ) {
-                        return (k + '安打')
-                    }
-                }
+            for (let k = 0; k <= 4; k++) {
+                if( ( (anda + k) / (dasu + 4) ) >= 0.3 ) return (k + '安打')
+            }
         },
         findMax: function(mainData) {
             const dataList = mainData.reduce((result, current) => {
