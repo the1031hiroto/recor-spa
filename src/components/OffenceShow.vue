@@ -317,9 +317,7 @@ export default {
             return mainData
         },
         calculation_WOBA_avr: function(mainData) {
-            const WOBA_sum = mainData.reduce((result, current) => {
-                return result + current["WOBA"] || 0
-            },0)
+            const WOBA_sum = mainData.reduce((result, current) => result + current["WOBA"] || 0, 0);
             this.add_WRAA(mainData, WOBA_sum / mainData.length)
         },
         add_WRAA: function(mainData, WOBA_avr) {
