@@ -2,5 +2,14 @@
   "projects": {
     "staging": "recor-spa",
     "default": "recor-spa"
+  },
+  "targets": {
+    "recor-spa": {
+      "hosting": {
+        "record-view": [
+          "record-view"
+        ]
+      }
+    }
   }
 }

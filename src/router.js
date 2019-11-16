@@ -17,7 +17,7 @@ Vue.use(Router)
 let router =  new Router({
     mode: 'history',
     routes: [
-
+      { path: '/', redirect: '/team/本牧野球大好きーズ/offence-show' },
         {
             path: '/team/:team',
             name: 'Home',

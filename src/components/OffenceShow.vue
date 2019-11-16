@@ -238,7 +238,8 @@ export default {
             this.filterData(20)
         },
         intFirebase: function() {
-            const team = this.currentTeam['uid']
+            // const team = this.currentTeam['uid']
+            const team = 'WSKf7MiSevOyeMp6y7iorZyt4pk2'
             const directory = '/offence'
             return firebase.database().ref(team + directory)
         },

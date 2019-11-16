@@ -1,49 +1,6 @@
 <template>
   <div id="app">
     <router-view/>
-    <div id="app" class="container-fluid">
-      <div class="row justify-content-end">
-          <p class="col-3">Menu</p>
-      </div>
-      <div v-if="this.$route.params.team" class="row">
-        <div class="col-12">
-          <div class="row justify-content-end">
-            <div class="col-auto my-2">
-              <button @click="linkPush('OffenceShow')" class="btn btn-outline-info">打撃成績</button>
-            </div>
-            <div class="col-auto my-2">
-              <button @click="linkPush('DeffenceShow')" class="btn btn-outline-info">守備成績</button>
-            </div>
-            <div class="col-auto my-2">
-              <button @click="linkPush('PitcherShow')" class="btn btn-outline-info">投手成績</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div v-if="isSignedIn" class="row my-3 justify-content-end">
-        <div class="col-auto">
-          <button @click="signOut" class="btn btn-outline-warning">ログアウト</button>
-        </div>
-        <div class="col-auto">
-          <button @click="linkHome('Home')" class="btn btn-outline-success">HOME</button>
-        </div>
-      </div>
-      <div class="row my-3">
-        <div class="col-12">
-          <h3>チーム一覧</h3>
-        </div>
-        <div v-for="(team, index) in teamList" :key="index" @click="link('Home', team['チーム名'])" class="col-auto my-1">
-          <button
-            class="btn btn-outline-success mx-1 btn-sm">
-            {{ team['チーム名'] }}
-          </button>
-        </div>
-      </div>
-      <div v-if="!isSignedIn">
-        <h4 class="font-weight-bold">成績追加する為にはログインが必要です。</h4>
-        <router-link tag="button" to="/signin" class="btn btn-outline-info font-weight-bold">ログイン</router-link>
-      </div>
-    </div>
   </div>
 </template>
 <script>
